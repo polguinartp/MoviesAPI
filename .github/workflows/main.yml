@@ -22,7 +22,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./ApiApplication
           file: ./ApiApplication/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/api-application:latest
