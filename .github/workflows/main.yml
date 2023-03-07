@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Generate and push Docker image
-        uses: ./.github/custom-action
+        uses: ./.github
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           token: ${{ secrets.DOCKERHUB_TOKEN }}
