@@ -11,7 +11,6 @@ outputs:
   text:
     description: "congrats for the image build!"
 runs:
-  using: 'docker'
   steps:        
     - name: Login to Docker Hub
       uses: docker/login-action@v2
