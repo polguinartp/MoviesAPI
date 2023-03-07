@@ -1,9 +1,10 @@
 ﻿using ApiApplication.DTOs.API;
+using ApiApplication.Specifications;
 using ApiApplication.WebClients;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Repositories;
-using Infraestructure.Database.Specifications;
+using Domain.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -33,17 +34,17 @@ namespace ApiApplication.Services
             }
             else
             {
-                var specification = new AndSpecification<ShowtimeEntity>();
+                var specification = Specification<ShowtimeEntity>.All;
                 if (date != default)
                 {
-                    specification.AddExpression(entity => date >= entity.StartDate && date <= entity.EndDate);
+                    specification = specification.And(new ReleaseDateOlderThanSixMontsSpecification(date));
                 }
                 if (movieTitle != null)
                 {
-                    specification.AddExpression(entity => entity.Movie.Title.ToUpper() == movieTitle.ToUpper());
+                    specification = specification.And(new MovieTitleSpecification(movieTitle));
                 }
 
-                entities = await _repository.GetCollectionAsync(specification.QueryExpression);
+                entities = await _repository.GetCollectionAsync(specification.ToExpression());
             }
 
             return entities;
