@@ -1,5 +1,5 @@
 ﻿using Domain.Entities;
-using Infraestructure.Database;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,8 +13,7 @@ namespace ApiApplication.Database
         {
             using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var context = serviceScope.ServiceProvider.GetService<CinemaContext>();
-            context.Database.EnsureCreated();          
-            
+            context.Database.EnsureCreated();
 
             context.Auditoriums.Add(new AuditoriumEntity
             {
@@ -36,7 +35,7 @@ namespace ApiApplication.Database
                         },
                         Schedule = new List<string> { "16:00", "17:00", "18:00", "18:30", "19:00", "22:00" },
                         AuditoriumId = 1
-                    } 
+                    }
                 },
                 Seats = 56
             });

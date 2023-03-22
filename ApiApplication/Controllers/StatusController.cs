@@ -7,7 +7,7 @@ using static ApiApplication.Auth.Constants;
 namespace ApiApplication.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [Authorize(Roles = Roles.Read)]
     public class StatusController : Controller
     {

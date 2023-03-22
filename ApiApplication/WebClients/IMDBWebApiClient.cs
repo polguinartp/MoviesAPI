@@ -12,21 +12,20 @@ namespace ApiApplication.WebClients
     public class IMDBWebApiClient : IIMDBWebApiClient
     {
         private readonly WebApiClientOptions _options;
+        private readonly HttpClient _httpClient;
 
-        public IMDBWebApiClient(IOptions<WebApiClientOptions> options)
+        public IMDBWebApiClient(IOptions<WebApiClientOptions> options, HttpClient httpClient)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public async Task<IMDBMovieInfo> GetMovieInfoAsync(string imdbId)
         {
             HttpResponseMessage httpResponseMessage;
-            using (var httpClient = new HttpClient())
-            {
-                var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}/{imdbId}";
-                httpResponseMessage = await httpClient.GetAsync(path);
-            }
-
+            var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}/{imdbId}";
+            httpResponseMessage = await _httpClient.GetAsync(path);
+            
             httpResponseMessage.EnsureSuccessStatusCode();
 
             await using var stream = await httpResponseMessage.Content.ReadAsStreamAsync();

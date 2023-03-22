@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace ApiApplication.Middlewares
@@ -21,7 +23,17 @@ namespace ApiApplication.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            _logger.LogInformation($"Call to {context.Request.Path}/{context.Request.Method} at {DateTime.Now}");
+            var watch = new Stopwatch();
+            watch.Start();
+            
+            context.Response.OnStarting(() =>
+            {
+                watch.Stop();
+                _logger.LogInformation($"Execution time for call to {context.Request.Path}/{context.Request.Method}: {watch.ElapsedMilliseconds} ms");
+
+                return Task.CompletedTask;
+            });
+            
             await _next(context);
         }
     }

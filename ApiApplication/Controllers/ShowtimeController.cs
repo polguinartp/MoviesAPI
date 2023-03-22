@@ -1,4 +1,5 @@
-﻿using ApiApplication.Auth;
+﻿using ApiApplication.ActionFilters;
+using ApiApplication.Auth;
 using ApiApplication.DTOs.API;
 using ApiApplication.Services;
 using AutoMapper;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace ApiApplication.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ShowtimeController : Controller
     {
         private readonly IShowtimeService _service;
@@ -36,6 +37,7 @@ namespace ApiApplication.Controllers
 
         [HttpPost("")]
         [Authorize(Roles = Constants.Roles.Write)]
+        [ServiceFilter(typeof(ShowtimeActionFilter))]
         public async Task<ActionResult<Showtime>> PostAsync([FromBody] Showtime showtime)
         {
             if (showtime?.Movie?.ImdbId == default)
@@ -49,6 +51,7 @@ namespace ApiApplication.Controllers
 
         [HttpPut("")]
         [Authorize(Roles = Constants.Roles.Write)]
+        [ServiceFilter(typeof(ShowtimeActionFilter))]
         public async Task<ActionResult<Showtime>> Put([FromBody] Showtime showtime)
         {
             if ((await _service.GetByIdAsync(showtime.Id)) == null)

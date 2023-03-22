@@ -16,26 +16,28 @@ using System.Threading.Tasks;
 
 namespace ApiApplicationUnitTests
 {
-
     [TestClass]
     public class ShowtimeServiceUnitTests
     {
-        private Mock<IShowtimesRepository> _mockShowtimesRepository;
+        private Mock<IRepository<ShowtimeEntity>> _mockShowtimesRepository;
+        private Mock<IRepository<MovieEntity>> _mockMoviesRepository;
         private Mock<IIMDBWebApiClient> _mockWebApiClient;
         private Mock<IMapper> _mockMapper;
 
         private List<IMDBMovieInfo> _moviesInfos = TestDataProvider.Instance.GetMoviesInfos();
         private List<MovieEntity> _moviesEntities = TestDataProvider.Instance.GetMovies();
-        private List<ShowtimeEntity> _showtimesEntities = TestDataProvider.Instance.GetShowtimes();        
+        private List<ShowtimeEntity> _showtimesEntities = TestDataProvider.Instance.GetShowtimes();
 
         [TestInitialize]
         public void Init()
         {
-            _mockShowtimesRepository = new Mock<IShowtimesRepository>();
-            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync()).ReturnsAsync(_showtimesEntities);
-            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>()))
-                .ReturnsAsync((Expression<Func<ShowtimeEntity, bool>> filter) => _showtimesEntities.AsQueryable().Where(filter));
-            _mockShowtimesRepository.Setup(repository => repository.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((int id) =>
+            _mockShowtimesRepository = new Mock<IRepository<ShowtimeEntity>>();
+            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
+                It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),
+                It.IsAny<string>()))
+                .ReturnsAsync(_showtimesEntities);
+
+            _mockShowtimesRepository.Setup(repository => repository.GetByIdAsync(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync((int id, string includeProperties) =>
             {
                 return _showtimesEntities.FirstOrDefault(showtime => showtime.Id == id);
             });
@@ -43,6 +45,24 @@ namespace ApiApplicationUnitTests
             {
                 var index = _showtimesEntities.FindIndex(showtime => showtime.Id == entity.Id);
                 _showtimesEntities[index] = entity;
+
+                return entity;
+            });
+
+            _mockMoviesRepository = new Mock<IRepository<MovieEntity>>();
+            _mockMoviesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<MovieEntity, bool>>>(),
+                It.IsAny<Func<IQueryable<MovieEntity>, IOrderedQueryable<MovieEntity>>>(),
+                It.IsAny<string>()))
+                .ReturnsAsync(_moviesEntities);
+
+            _mockMoviesRepository.Setup(repository => repository.GetByIdAsync(It.IsAny<int>(), It.IsAny<string>())).ReturnsAsync((int id, string includeProperties) =>
+            {
+                return _moviesEntities.FirstOrDefault(showtime => showtime.Id == id);
+            });
+            _mockMoviesRepository.Setup(x => x.UpdateAsync(It.IsAny<MovieEntity>())).ReturnsAsync((MovieEntity entity) =>
+            {
+                var index = _moviesEntities.FindIndex(showtime => showtime.Id == entity.Id);
+                _moviesEntities[index] = entity;
 
                 return entity;
             });
@@ -63,7 +83,7 @@ namespace ApiApplicationUnitTests
             {
                 return _showtimesEntities.First(showtimeEntity => showtimeEntity.Id == showtime.Id);
             });
-            
+
             _mockMapper.Setup(mapper => mapper.Map(It.IsAny<Showtime>(), It.IsAny<ShowtimeEntity>()))
                 .Callback((Showtime showtime, ShowtimeEntity showtimeEntity) =>
                 {
@@ -77,10 +97,18 @@ namespace ApiApplicationUnitTests
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Constructor_ShouldThrowArgumentNullException_WhenRepositoryIsNull()
+        public void Constructor_ShouldThrowArgumentNullException_WhenShowtimesRepositoryIsNull()
         {
             // Arrange
-            _ = new ShowtimeService(null, _mockWebApiClient.Object, _mockMapper.Object);
+            _ = new ShowtimeService(null, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Constructor_ShouldThrowArgumentNullException_WhenMoviesRepositoryIsNull()
+        {
+            // Arrange
+            _ = new ShowtimeService(_mockShowtimesRepository.Object, null, _mockWebApiClient.Object, _mockMapper.Object);
         }
 
         [TestMethod]
@@ -88,7 +116,7 @@ namespace ApiApplicationUnitTests
         public void Constructor_ShouldThrowArgumentNullException_WhenWebApiClientIsNull()
         {
             // Arrange
-            _ = new ShowtimeService(_mockShowtimesRepository.Object, null, _mockMapper.Object);
+            _ = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, null, _mockMapper.Object);
         }
 
         [TestMethod]
@@ -96,18 +124,18 @@ namespace ApiApplicationUnitTests
         public void Constructor_ShouldThrowArgumentNullException_WhenMapperIsNull()
         {
             // Arrange
-            _ = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, null);
+            _ = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, null);
         }
 
         [TestMethod]
         public async Task GetAsync_ShouldReturnExpectedResult_WhenNoFilters()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
 
             // Act
             var result = await subjectUnderTest.GetAsync();
-            
+
             // Assert
             CollectionAssert.AreEquivalent(_showtimesEntities, result.ToList());
         }
@@ -116,14 +144,19 @@ namespace ApiApplicationUnitTests
         public async Task GetAsync_ShouldReturnExpectedResult_WhenDateFilter()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
-
-            // Act
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
             var date = DateTime.Parse("2022-05-04");
+            var expectedResult = _showtimesEntities.Where(showtime => date >= showtime.StartDate && date <= showtime.EndDate).ToList();
+
+            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
+                It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),
+                It.IsAny<string>()))
+                .ReturnsAsync(expectedResult);
+
+            // Act            
             var result = await subjectUnderTest.GetAsync(date);
 
-            // Assert
-            var expectedResult = _showtimesEntities.Where(showtime => date >= showtime.StartDate && date <= showtime.EndDate).ToList();
+            // Assert            
             CollectionAssert.AreEquivalent(expectedResult, result.ToList());
         }
 
@@ -131,14 +164,19 @@ namespace ApiApplicationUnitTests
         public async Task GetAsync_ShouldReturnExpectedResult_WhenMovieTitleFilter()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+            var title = "The Best Movie Ever 3";
+            var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper()).ToList();
+
+            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
+                It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),
+                It.IsAny<string>()))
+                .ReturnsAsync(expectedResult);
 
             // Act
-            var title = "The Best Movie Ever 3";
             var result = await subjectUnderTest.GetAsync(movieTitle: title);
 
-            // Assert
-            var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper()).ToList();
+            // Assert            
             CollectionAssert.AreEquivalent(expectedResult, result.ToList());
         }
 
@@ -146,15 +184,20 @@ namespace ApiApplicationUnitTests
         public async Task GetAsync_ShouldReturnExpectedResult_WhenAllFilters()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
-
-            // Act
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
             var date = DateTime.Parse("2022-05-06");
             var title = "The Best Movie Ever 3";
+            var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper() && date >= showtime.StartDate && date <= showtime.EndDate).ToList();
+
+            _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
+                It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),
+                It.IsAny<string>()))
+                .ReturnsAsync(expectedResult);
+
+            // Act
             var result = await subjectUnderTest.GetAsync(date, title);
 
-            // Assert
-            var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper() && date >= showtime.StartDate && date <= showtime.EndDate).ToList();
+            // Assert            
             CollectionAssert.AreEquivalent(expectedResult, result.ToList());
         }
 
@@ -181,8 +224,8 @@ namespace ApiApplicationUnitTests
             _mockMapper.Setup(mapper => mapper.Map<MovieEntity>(It.Is<IMDBMovieInfo>(movieInfo => movieInfo == _newMovieInfo))).Returns(_newMovieEntity);
             _mockMapper.Setup(mapper => mapper.Map<MovieEntity>(It.Is<Movie>(movie => movie == _newMovie))).Returns(_newMovieEntity);
             _mockMapper.Setup(mapper => mapper.Map<ShowtimeEntity>(It.Is<Showtime>(shwotime => shwotime.Id == _newShowtime.Id))).Returns(_newShowtimeEntity);
-            
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);                                               
+
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
 
             // Act
             var result = await subjectUnderTest.CreateAsync(_newShowtime);
@@ -203,9 +246,9 @@ namespace ApiApplicationUnitTests
                 Movie = null,
                 AuditoriumId = 3,
                 Schedule = "18:00"
-            };            
+            };
 
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);            
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
 
             // Act
             var result = await subjectUnderTest.UpdateAsync(updatedShowtime);
@@ -224,7 +267,7 @@ namespace ApiApplicationUnitTests
         public async Task PutAsync_ShouldWorkAsExpected_WhenMovieIsNotNull()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
 
             // Act
             var showtime = new Showtime()
@@ -255,7 +298,7 @@ namespace ApiApplicationUnitTests
         public async Task DeleteAsync_ShouldWorkAsExpected()
         {
             // Arrange
-            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
+            var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object);
 
             _mockShowtimesRepository.Setup(repository => repository.DeleteAsync(It.IsAny<int>()))
                 .Callback((int id) =>
@@ -269,7 +312,7 @@ namespace ApiApplicationUnitTests
             await subjectUnderTest.DeleteAsync(_showtimesEntities[2].Id);
 
             // Assert
-            var result = await subjectUnderTest.GetAsync();            
+            var result = await subjectUnderTest.GetAsync();
             CollectionAssert.AreEquivalent(_showtimesEntities, result.ToList());
             Assert.AreEqual(count - 1, _showtimesEntities.Count);
         }

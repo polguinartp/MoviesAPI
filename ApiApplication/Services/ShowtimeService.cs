@@ -7,30 +7,37 @@ using Domain.Repositories;
 using Domain.Specifications;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiApplication.Services
 {
     public class ShowtimeService : IShowtimeService
     {
-        private readonly IShowtimesRepository _repository;
+        private readonly IRepository<ShowtimeEntity> _showtimeEntitiesRepository;
+        private readonly IRepository<MovieEntity> _movieEntitiesRepository;
         private readonly IIMDBWebApiClient _webClient;
         private readonly IMapper _mapper;
 
-        public ShowtimeService(IShowtimesRepository repository, IIMDBWebApiClient webClient, IMapper mapper)
+        public ShowtimeService(IRepository<ShowtimeEntity> showtimeEntitiesRepository,
+            IRepository<MovieEntity> movieEntitiesRepository,
+            IIMDBWebApiClient webClient,
+            IMapper mapper)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _showtimeEntitiesRepository = showtimeEntitiesRepository ?? throw new ArgumentNullException(nameof(showtimeEntitiesRepository));
             _webClient = webClient ?? throw new ArgumentNullException(nameof(webClient));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _movieEntitiesRepository = movieEntitiesRepository ?? throw new ArgumentNullException(nameof(movieEntitiesRepository));
         }
 
         public async Task<IEnumerable<ShowtimeEntity>> GetAsync(DateTime date = default, string movieTitle = null)
         {
-            IEnumerable<ShowtimeEntity> entities;
-
+            IEnumerable<ShowtimeEntity> entities = new List<ShowtimeEntity>();
+            var includeProperties = "Movie";
+            
             if (date == default && movieTitle == null)
             {
-                entities = await _repository.GetCollectionAsync();
+                entities = await _showtimeEntitiesRepository.GetCollectionAsync(includeProperties: includeProperties);
             }
             else
             {
@@ -44,7 +51,8 @@ namespace ApiApplication.Services
                     specification = specification.And(new MovieTitleSpecification(movieTitle));
                 }
 
-                entities = await _repository.GetCollectionAsync(specification.ToExpression());
+                entities = await _showtimeEntitiesRepository.GetCollectionAsync(filter: specification.ToExpression(),
+                    includeProperties: includeProperties);
             }
 
             return entities;
@@ -52,22 +60,30 @@ namespace ApiApplication.Services
 
         public async Task<ShowtimeEntity> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            var includeProperties = "Movie";
+            return await _showtimeEntitiesRepository.GetByIdAsync(id, includeProperties);
         }
 
         public async Task<ShowtimeEntity> CreateAsync(Showtime showtime)
-        {
+        {                        
             var showtimeEntity = _mapper.Map<ShowtimeEntity>(showtime);
 
             var movieInfo = await _webClient.GetMovieInfoAsync(showtime.Movie.ImdbId);
             showtimeEntity.Movie = _mapper.Map<MovieEntity>(movieInfo);
 
-            return await _repository.AddAsync(showtimeEntity);
+            var movies = await _movieEntitiesRepository.GetCollectionAsync();
+            var existingMovie = movies.FirstOrDefault(x => x.Equals(showtimeEntity.Movie));
+            if (existingMovie != null)
+            {
+                showtimeEntity.Movie = existingMovie;
+            }
+
+            return await _showtimeEntitiesRepository.AddAsync(showtimeEntity);
         }
 
         public async Task<ShowtimeEntity> UpdateAsync(Showtime showtime)
         {
-            var existingEntity = await _repository.GetByIdAsync(showtime.Id);
+            var existingEntity = await _showtimeEntitiesRepository.GetByIdAsync(showtime.Id);
             _mapper.Map(showtime, existingEntity);
 
             if (showtime.Movie != null && showtime.Movie.ImdbId != existingEntity.Movie.ImdbId)
@@ -76,12 +92,12 @@ namespace ApiApplication.Services
                 existingEntity.Movie = _mapper.Map<MovieEntity>(movieInfo);
             }
 
-            return await _repository.UpdateAsync(existingEntity);
+            return await _showtimeEntitiesRepository.UpdateAsync(existingEntity);
         }
 
         public async Task DeleteAsync(int id)
         {
-            await _repository.DeleteAsync(id);
-        }        
+            await _showtimeEntitiesRepository.DeleteAsync(id);
+        }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace Infraestructure.Database
+namespace Infrastructure.Database
 {
     public class CinemaContext : DbContext
     {

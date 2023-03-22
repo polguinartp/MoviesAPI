@@ -1,3 +1,4 @@
+using ApiApplication.ActionFilters;
 using ApiApplication.Auth;
 using ApiApplication.Database;
 using ApiApplication.Exceptions;
@@ -5,8 +6,9 @@ using ApiApplication.Middlewares;
 using ApiApplication.Options;
 using ApiApplication.Services;
 using ApiApplication.WebClients;
+using Domain.Entities;
 using Domain.Repositories;
-using Infraestructure.Database;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -33,20 +35,24 @@ namespace ApiApplication
             {
                 options.UseInMemoryDatabase("CinemaDb")
                     .EnableSensitiveDataLogging()
-                    .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));                
+                    .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
             });
             services.AddAutoMapper(typeof(Startup));
-            
-            services.AddTransient<IShowtimeService, ShowtimeService>();
-            services.AddTransient<IIMDBWebApiClient, IMDBWebApiClient>();
-            services.AddTransient<IShowtimesRepository, ShowtimesRepository>();
 
-            services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
-            
+            services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
+            services.AddTransient<IShowtimeService, ShowtimeService>();
+            services.AddTransient<IRepository<ShowtimeEntity>, BaseRepository<ShowtimeEntity>>();
+            services.AddTransient<IRepository<AuditoriumEntity>, BaseRepository<AuditoriumEntity>>();
+            services.AddTransient<IRepository<MovieEntity>, BaseRepository<MovieEntity>>();
+
+            services.AddScoped<ShowtimeActionFilter>();
+
+            services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();            
+                        
             services.AddAuthentication(options =>
             {
                 options.AddScheme<CustomAuthenticationHandler>(CustomAuthenticationSchemeOptions.AuthenticationScheme, CustomAuthenticationSchemeOptions.AuthenticationScheme);
-                options.RequireAuthenticatedSignIn = true;                
+                options.RequireAuthenticatedSignIn = true;
                 options.DefaultScheme = CustomAuthenticationSchemeOptions.AuthenticationScheme;
             });
 
@@ -68,13 +74,13 @@ namespace ApiApplication
 
             app.UseMiddleware<RequestLoggerMiddleware>();
             app.ConfigureExceptionHandler();
-
+            
             app.UseHttpsRedirection();
-
+            
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

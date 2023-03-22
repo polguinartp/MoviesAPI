@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace ApiApplication.DTOs.API
@@ -9,11 +10,12 @@ namespace ApiApplication.DTOs.API
         public string Title { get; set; }
 
         [JsonPropertyName("imdb_id")]
-        public string ImdbId { get; set; }
+        [Required]
+        public string ImdbId { get; set; }        
 
         [JsonPropertyName("starts")]
         public string Stars { get; set; }
-
+        
         [JsonPropertyName("release_date")]
         public DateTime ReleaseDate { get; set; }
     }
