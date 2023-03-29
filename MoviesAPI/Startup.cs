@@ -20,8 +20,7 @@ using MoviesAPI.WebClients;
 namespace MoviesAPI
 {
     public class Startup
-    {
-        //Dummy change
+    {        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
