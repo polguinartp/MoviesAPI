@@ -1,0 +1,12 @@
+version: '3.4'
+services:
+  moviesapi:
+    container_name: moviesapi
+    image: usuariocaramelos/moviesapi:first
+    build: .
+    ports:
+      - 8083:80
+    networks:
+      - app-net
+networks:
+  app-net:
