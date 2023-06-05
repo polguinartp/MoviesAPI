@@ -35,12 +35,9 @@ namespace MoviesAPI.WebClients
         public async Task<HttpStatusCode> GetStatus()
         {
             HttpResponseMessage httpResponseMessage;
-            using (var httpClient = new HttpClient())
-            {
-                var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
-                httpResponseMessage = await httpClient.GetAsync(path);
-            }
-
+            var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
+            httpResponseMessage = await _httpClient.GetAsync(path);
+            
             return httpResponseMessage.StatusCode;
         }
     }

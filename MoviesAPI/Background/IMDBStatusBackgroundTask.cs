@@ -21,7 +21,7 @@ namespace MoviesAPI.Background
         public IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IOptions<WebApiClientOptions> options)
         {
             _webApiClient = webApiClient ?? throw new ArgumentNullException(nameof(webApiClient));
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(webApiClient)); ;
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(webApiClient));
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

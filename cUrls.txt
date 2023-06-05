@@ -1,20 +1,20 @@
-curl --location --request GET 'https://localhost:7629/showtime' \
+curl --location --request GET 'https://localhost:7629/api/showtime' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --header 'Content-Type: application/json' \
 --data ''
 
-curl --location 'https://localhost:7629/status' \
+curl --location 'https://localhost:7629/api/status' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --header 'Content-Type: application/json' \
 --data ''
 
-curl --location --request POST 'https://localhost:7629/showtime/' \
+curl --location --request POST 'https://localhost:7629/api/showtime/' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --header 'Content-Type: application/json' \
 --data '{
   "start_date": "2022-03-01",
   "end_date": "2022-03-05",
-  "schedule": "",
+  "schedule": "17:00",
   "movie": {
     "imdb_id": "tt0111161"
   },
@@ -22,18 +22,18 @@ curl --location --request POST 'https://localhost:7629/showtime/' \
 }
 '
 
-curl --location --request GET 'https://localhost:7629/showtime' \
+curl --location --request GET 'https://localhost:7629/api/showtime' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --header 'Content-Type: application/json' \
---data ''
+--data '' 
 
-curl --location 'https://localhost:7629/showtime/' \
+curl --location 'https://localhost:7629/api/showtime/' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --header 'Content-Type: application/json' \
 --data '{
   "start_date": "2022-03-02",
   "end_date": "2022-03-06",
-  "schedule": "",
+  "schedule": "16:00",
   "movie": {
     "imdb_id": "tt0111161"
   },
@@ -41,30 +41,30 @@ curl --location 'https://localhost:7629/showtime/' \
 }
 '
 
-curl --location --request GET 'https://localhost:7629/showtime' \
+curl --location --request GET 'https://localhost:7629/api/showtime' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --header 'Content-Type: application/json' \
 --data ''
 
-curl --location --request DELETE 'https://localhost:7629/showtime/2' \
+curl --location --request DELETE 'https://localhost:7629/api/showtime/2' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --data ''
 
-curl --location 'https://localhost:7629/showtime?date=2022-03-04' \
+curl --location 'https://localhost:7629/api/showtime?date=2022-03-04' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --data ''
 
-curl --location 'https://localhost:7629/showtime?movieTitle=Inception' \
+curl --location 'https://localhost:7629/api/showtime?movieTitle=Inception' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --data ''
 
-curl --location 'https://localhost:7629/showtime/' \
+curl --location 'https://localhost:7629/api/showtime/' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --header 'Content-Type: application/json' \
 --data '{
   "start_date": "2023-08-10",
   "end_date": "2023-09-15",
-  "schedule": "",
+  "schedule": "16:00",
   "movie": {
     "imdb_id": "tt9253866"
   },
@@ -72,14 +72,14 @@ curl --location 'https://localhost:7629/showtime/' \
 }
 '
 
-curl --location --request PUT 'https://localhost:7629/showtime' \
+curl --location --request PUT 'https://localhost:7629/api/showtime' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --header 'Content-Type: application/json' \
 --data '{
   "id" : 4,
   "start_date": "2023-08-10",
   "end_date": "2023-09-15",
-  "schedule": "",
+  "schedule": "15:00",
   "movie": {
     "imdb_id": "tt1375666"
   },
@@ -87,15 +87,15 @@ curl --location --request PUT 'https://localhost:7629/showtime' \
 }
 '
 
-curl --location 'https://localhost:7629/showtime?movieTitle=Inception' \
+curl --location 'https://localhost:7629/api/showtime?movieTitle=Inception' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --data ''
 
-curl --location --request DELETE 'https://localhost:7629/showtime/1' \
+curl --location --request DELETE 'https://localhost:7629/api/showtime/1' \
 --header 'ApiKey: Nzg5NHxXcml0ZQ==' \
 --data ''
 
-curl --location --request GET 'https://localhost:7629/showtime' \
+curl --location --request GET 'https://localhost:7629/api/showtime' \
 --header 'ApiKey: MTIzNHxSZWFk' \
 --header 'Content-Type: application/json' \
 --data ''

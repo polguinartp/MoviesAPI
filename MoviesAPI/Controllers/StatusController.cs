@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesAPI.Background;
 using MoviesAPI.DTOs.API;
+using System.Threading.Tasks;
 using static MoviesAPI.Auth.Constants;
 
 namespace MoviesAPI.Controllers
@@ -12,9 +13,9 @@ namespace MoviesAPI.Controllers
     public class StatusController : Controller
     {
         [HttpGet("")]
-        public ActionResult<IMDBStatus> Get()
+        public async Task<ActionResult<IMDBStatus>> GetAsync()
         {
-            return Ok(IMDBStatusSingleton.Instance.Status);
+            return await Task.FromResult(Ok(IMDBStatusSingleton.Instance.Status));
         }
     }
 }

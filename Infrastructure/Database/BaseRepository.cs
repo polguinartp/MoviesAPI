@@ -56,7 +56,9 @@ namespace Infrastructure.Database
 
         public async Task<T> AddAsync(T entity)
         {
-            var result = _dbSet.Add(entity).Entity;            
+            //TODO: when adding an Entity with an existing navigation property it removes this navigation property from the existing attached entity and
+            //attaches it to the added one. This has to be fixed!!!
+            var result = _dbSet.Attach(entity).Entity;
             await _context.SaveChangesAsync();
 
             return result;
