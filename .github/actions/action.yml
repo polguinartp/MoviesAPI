@@ -9,7 +9,7 @@ inputs:
     required: true
 outputs:
   text:
-    description: "congrats for the image build!"
+    description: "moviesapi:latest image successfully build in docker."
 runs:
   using: 'composite'
   steps:        
