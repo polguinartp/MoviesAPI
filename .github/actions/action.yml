@@ -1,5 +1,5 @@
 name: "custom action for generating a docker image"
-description: "this is a custom action that generates and pushes a Docker image to a repository called MoviesAPI with tag 'latest'"
+description: "this is a custom action that generates and pushes a Docker image to a repository called moviesapi with tag 'latest'"
 inputs:
   username:
     description: "username for the user of the Docker repository"
