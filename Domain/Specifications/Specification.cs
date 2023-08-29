@@ -1,4 +1,5 @@
-﻿using Domain.Specifications.Identity;
+﻿using Domain.Entities;
+using Domain.Specifications.Identity;
 using Domain.Specifications.Operators;
 using System;
 using System.Linq.Expressions;
