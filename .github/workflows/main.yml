@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['3.1x']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
