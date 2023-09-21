@@ -20,7 +20,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --no-restore 
+        run: dotnet test --configuration Release --no-restore 
         
       #- name: Docker
          #uses: ./.github/actions
