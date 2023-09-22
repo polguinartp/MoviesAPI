@@ -10,8 +10,10 @@ jobs:
       matrix:
         dotnet-version: ['3.1x']
     steps:
-      - name: Checkout
+      - name: Setup
         uses: actions/checkout@v2
+        with:
+          dotnet-version: 3.1.101  
 
       - name: Restore
         run: dotnet restore
