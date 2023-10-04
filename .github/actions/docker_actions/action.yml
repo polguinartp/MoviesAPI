@@ -1,4 +1,4 @@
-name: "custom action for generating a docker image"
+name: "docker_build_image"
 description: "this is a custom action that generates and pushes a Docker image to a repository called moviesapi with tag 'latest'"
 inputs:
   username:
