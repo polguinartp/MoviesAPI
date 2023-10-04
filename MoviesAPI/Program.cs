@@ -1,57 +1,78 @@
-using Microsoft.AspNetCore.Hosting;
+using Domain.Entities;
+using Domain.Repositories;
+using Infrastructure.Database;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MoviesAPI.ActionFilters;
+using MoviesAPI.Auth;
+using MoviesAPI.Exceptions;
+using MoviesAPI.Middlewares;
+using MoviesAPI.Options;
+using MoviesAPI.Services;
+using MoviesAPI.WebClients;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System;
 using MoviesAPI.Background;
 using Serilog;
-using System;
+using MoviesAPI.Database;
 
-namespace MoviesAPI
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<CinemaContext>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            try
-            {
-                InitializeLogging();
-                Log.Information("Application Starting.");
+    options.UseInMemoryDatabase("CinemaDb")
+        .EnableSensitiveDataLogging()
+        .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+});
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-                CreateHostBuilder(args).Build().Run();
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "The Application failed to start.");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
+builder.Services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
+builder.Services.AddTransient<IShowtimeService, ShowtimeService>();
+builder.Services.AddTransient<IRepository<ShowtimeEntity>, BaseRepository<ShowtimeEntity>>();
+builder.Services.AddTransient<IRepository<AuditoriumEntity>, BaseRepository<AuditoriumEntity>>();
+builder.Services.AddTransient<IRepository<MovieEntity>, BaseRepository<MovieEntity>>();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddHostedService<IMDBStatusBackgroundTask>();
-                });
+builder.Services.AddScoped<ShowtimeActionFilter>();
 
-        private static void InitializeLogging()
-        {
-            //Read Configuration from appSettings
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
+builder.Services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
 
-            //Initialize Logger
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(config)
-                .CreateLogger();
-        }
-    }
+builder.Services.AddAuthentication(options =>
+{
+    options.AddScheme<CustomAuthenticationHandler>(CustomAuthenticationSchemeOptions.AuthenticationScheme, CustomAuthenticationSchemeOptions.AuthenticationScheme);
+    options.RequireAuthenticatedSignIn = true;
+    options.DefaultScheme = CustomAuthenticationSchemeOptions.AuthenticationScheme;
+});
+
+builder.Services.AddOptions<WebApiClientOptions>().Bind(builder.Configuration.GetSection("WebApiClient"));
+
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<IMDBStatusBackgroundTask>();
+builder.Host.UseSerilog();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseMiddleware<RequestLoggerMiddleware>();
+app.ConfigureExceptionHandler();
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+SampleData.Initialize(app);
+
+app.Run();

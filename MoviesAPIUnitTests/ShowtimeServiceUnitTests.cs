@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities;
 using Domain.Repositories;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MoviesAPI.DTOs.API;
@@ -260,7 +259,7 @@ namespace MoviesAPIUnitTests
             Assert.AreEqual(DateTime.Parse(updatedShowtime.EndDate), result.EndDate);
             Assert.AreEqual(expectedMovie, result.Movie);
             Assert.AreEqual(updatedShowtime.AuditoriumId, result.AuditoriumId);
-            Assert.AreEqual(updatedShowtime.Schedule, result.Schedule.Join(","));
+            Assert.AreEqual(updatedShowtime.Schedule, string.Join(",", result.Schedule));
         }
 
         [TestMethod]
@@ -291,7 +290,7 @@ namespace MoviesAPIUnitTests
             Assert.AreEqual(DateTime.Parse(showtime.EndDate), result.EndDate);
             Assert.AreSame(expectedMovie, result.Movie);
             Assert.AreEqual(showtime.AuditoriumId, result.AuditoriumId);
-            Assert.AreEqual(showtime.Schedule, result.Schedule.Join(","));
+            Assert.AreEqual(showtime.Schedule, string.Join(",", result.Schedule));
         }
 
         [TestMethod]
