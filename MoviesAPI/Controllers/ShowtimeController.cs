@@ -37,7 +37,7 @@ namespace MoviesAPI.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = Constants.Roles.Read)]
-        public async Task<ActionResult<Showtime>> Get(int id)
+        public async Task<ActionResult<Showtime>> GetAsync(int id)
         {
             ShowtimeEntity showtime = await _service.GetByIdAsync(id);
             return Ok(_mapper.Map<Showtime>(showtime));

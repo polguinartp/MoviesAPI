@@ -16,8 +16,11 @@ namespace MoviesAPI.WebClients
 
         public IMDBWebApiClient(IOptions<WebApiClientOptions> options, HttpClient httpClient)
         {
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentNullException.ThrowIfNull(httpClient);
+
+            _options = options.Value;
+            _httpClient = httpClient;
         }
 
         public async Task<IMDBMovieInfo> GetMovieInfoAsync(string imdbId)
