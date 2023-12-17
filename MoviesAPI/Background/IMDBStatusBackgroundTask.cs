@@ -7,54 +7,53 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MoviesAPI.Background
+namespace MoviesAPI.Background;
+
+/// <summary>
+/// Represents a class that checks the status for the IMDB Api in a background task.
+/// </summary>
+public class IMDBStatusBackgroundTask : IHostedService, IDisposable
 {
-    /// <summary>
-    /// Represents a class that checks the status for the IMDB Api in a background task.
-    /// </summary>
-    public class IMDBStatusBackgroundTask : IHostedService, IDisposable
+    private readonly IIMDBWebApiClient _webApiClient;
+    private readonly WebApiClientOptions _options;
+    private Timer _timer;
+
+    public IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IOptions<WebApiClientOptions> options)
     {
-        private readonly IIMDBWebApiClient _webApiClient;
-        private readonly WebApiClientOptions _options;
-        private Timer _timer;
+        _webApiClient = webApiClient ?? throw new ArgumentNullException(nameof(webApiClient));
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(webApiClient));
+    }
 
-        public IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IOptions<WebApiClientOptions> options)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _timer = new Timer(async o =>
         {
-            _webApiClient = webApiClient ?? throw new ArgumentNullException(nameof(webApiClient));
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(webApiClient));
-        }
+            var lastCall = DateTime.Now;
+            var status = await _webApiClient.GetStatus();
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _timer = new Timer(async o =>
+            var newStatus = new IMDBStatus()
             {
-                var lastCall = DateTime.Now;
-                var status = await _webApiClient.GetStatus();
+                LastCall = lastCall,
+                Up = status == System.Net.HttpStatusCode.OK
+            };
 
-                var newStatus = new IMDBStatus()
-                {
-                    LastCall = lastCall,
-                    Up = status == System.Net.HttpStatusCode.OK
-                };
+            IMDBStatusSingleton.Instance.Status = newStatus;
+        },
+        null,
+        TimeSpan.Zero,
+        TimeSpan.FromSeconds(_options.WebApiStatusTimestamp));
 
-                IMDBStatusSingleton.Instance.Status = newStatus;
-            },
-            null,
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(_options.WebApiStatusTimestamp));
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _timer?.Change(Timeout.Infinite, 0);
+        return Task.CompletedTask;
+    }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Change(Timeout.Infinite, 0);
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-        }
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

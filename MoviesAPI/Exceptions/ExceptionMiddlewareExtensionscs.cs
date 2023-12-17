@@ -4,38 +4,37 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 
-namespace MoviesAPI.Exceptions
+namespace MoviesAPI.Exceptions;
+
+/// <summary>
+/// Represents a class that configures the Exception middleware.
+/// </summary>
+public static class ExceptionMiddlewareExtensions
 {
     /// <summary>
-    /// Represents a class that configures the Exception middleware.
+    /// Method that ensures that the Exception middelware in the pipeline captures all the exceptions and puts them in the Response object in the required way.
     /// </summary>
-    public static class ExceptionMiddlewareExtensions
+    /// <param name="app"></param>
+    public static void ConfigureExceptionHandler(this IApplicationBuilder app)
     {
-        /// <summary>
-        /// Method that ensures that the Exception middelware in the pipeline captures all the exceptions and puts them in the Response object in the required way.
-        /// </summary>
-        /// <param name="app"></param>
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+        app.UseExceptionHandler(appError =>
         {
-            app.UseExceptionHandler(appError =>
+            appError.Run(async context =>
             {
-                appError.Run(async context =>
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    context.Response.ContentType = "application/json";
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                context.Response.ContentType = "application/json";
 
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature != null)
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                if (contextFeature != null)
+                {
+                    var errorInfo = new ErrorInfo()
                     {
-                        var errorInfo = new ErrorInfo()
-                        {
-                            StatusCode = context.Response.StatusCode,
-                            Message = $"Internal Server Error: {contextFeature.Error.Message}"
-                        };
-                        await context.Response.WriteAsync(errorInfo.ToString());
-                    }
-                });
+                        StatusCode = context.Response.StatusCode,
+                        Message = $"Internal Server Error: {contextFeature.Error.Message}"
+                    };
+                    await context.Response.WriteAsync(errorInfo.ToString());
+                }
             });
-        }
+        });
     }
 }

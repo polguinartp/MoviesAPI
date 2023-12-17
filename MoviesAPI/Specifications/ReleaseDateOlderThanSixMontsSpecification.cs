@@ -3,20 +3,19 @@ using Domain.Specifications;
 using System;
 using System.Linq.Expressions;
 
-namespace MoviesAPI.Specifications
+namespace MoviesAPI.Specifications;
+
+public class ReleaseDateOlderThanSixMontsSpecification : Specification<ShowtimeEntity>
 {
-    public class ReleaseDateOlderThanSixMontsSpecification : Specification<ShowtimeEntity>
+    private DateTime _date;
+
+    public ReleaseDateOlderThanSixMontsSpecification(DateTime date)
     {
-        private DateTime _date;
+        _date = date;
+    }
 
-        public ReleaseDateOlderThanSixMontsSpecification(DateTime date)
-        {
-            _date = date;
-        }
-
-        public override Expression<Func<ShowtimeEntity, bool>> ToExpression()
-        {
-            return x => _date >= x.StartDate && _date <= x.EndDate;
-        }
+    public override Expression<Func<ShowtimeEntity, bool>> ToExpression()
+    {
+        return x => _date >= x.StartDate && _date <= x.EndDate;
     }
 }

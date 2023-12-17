@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace MoviesAPI.Auth
+namespace MoviesAPI.Auth;
+
+public class CustomAuthenticationSchemeOptions : AuthenticationSchemeOptions
 {
-    public class CustomAuthenticationSchemeOptions : AuthenticationSchemeOptions
-    {
-        public const string AuthenticationScheme = "CustomAuthentication";
-    }
+    public const string AuthenticationScheme = "CustomAuthentication";
 }

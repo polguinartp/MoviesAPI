@@ -1,0 +1,34 @@
+﻿using Amazon.SQS.Model;
+using Infrastructure.SQS.Factories;
+using System;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+namespace Infrastructure.SQS.Services
+{
+    public class SQSService : ISQSService
+    {
+        private readonly ISQSFactory _sqsFactory;
+
+        public SQSService(ISQSFactory sqsFactory)
+        {
+            ArgumentNullException.ThrowIfNull(sqsFactory);
+
+            _sqsFactory = sqsFactory;
+        }
+
+        public async Task EnqueueMessageAsync(QueueMessage queueMessage)
+        {
+            var request = new SendMessageRequest()
+            {
+                MessageGroupId = Guid.NewGuid().ToString(),
+                MessageDeduplicationId = Guid.NewGuid().ToString(),
+                MessageBody = JsonSerializer.Serialize(queueMessage),
+                QueueUrl = _sqsFactory.QueueUrl
+            };
+
+            var sqsClient = _sqsFactory.CreateSQSClient();
+            await sqsClient.SendMessageAsync(request);
+        }
+    }
+}

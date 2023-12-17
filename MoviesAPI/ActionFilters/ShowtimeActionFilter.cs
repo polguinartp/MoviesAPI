@@ -6,34 +6,33 @@ using MoviesAPI.DTOs.API;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MoviesAPI.ActionFilters
+namespace MoviesAPI.ActionFilters;
+
+public class ShowtimeActionFilter : IAsyncActionFilter
 {
-    public class ShowtimeActionFilter : IAsyncActionFilter
+    private readonly IRepository<AuditoriumEntity> _repository;
+
+    public ShowtimeActionFilter(IRepository<AuditoriumEntity> repository)
     {
-        private readonly IRepository<AuditoriumEntity> _repository;
+        _repository = repository ?? throw new System.ArgumentNullException(nameof(repository));
+    }
 
-        public ShowtimeActionFilter(IRepository<AuditoriumEntity> repository)
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        var param = context.ActionArguments.SingleOrDefault(p => p.Value is Showtime);
+        if (param.Value == null)
         {
-            _repository = repository ?? throw new System.ArgumentNullException(nameof(repository));
+            context.Result = new BadRequestObjectResult("Null Showtime object");
+            return;
         }
 
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        var showtime = param.Value as Showtime;
+        if (await _repository.GetByIdAsync(showtime.AuditoriumId) == null)
         {
-            var param = context.ActionArguments.SingleOrDefault(p => p.Value is Showtime);
-            if (param.Value == null)
-            {
-                context.Result = new BadRequestObjectResult("Null Showtime object");
-                return;
-            }
-
-            var showtime = param.Value as Showtime;
-            if (await _repository.GetByIdAsync(showtime.AuditoriumId) == null)
-            {
-                context.Result = new NotFoundObjectResult($"Not found Auditorium with id {showtime.AuditoriumId}");
-                return;
-            }
-
-            await next();
+            context.Result = new NotFoundObjectResult($"Not found Auditorium with id {showtime.AuditoriumId}");
+            return;
         }
+
+        await next();
     }
 }

@@ -18,6 +18,9 @@ using System;
 using MoviesAPI.Background;
 using Serilog;
 using MoviesAPI.Database;
+using Infrastructure.Options;
+using Infrastructure.SQS.Factories;
+using Infrastructure.SQS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +38,10 @@ builder.Services.AddTransient<IRepository<ShowtimeEntity>, BaseRepository<Showti
 builder.Services.AddTransient<IRepository<AuditoriumEntity>, BaseRepository<AuditoriumEntity>>();
 builder.Services.AddTransient<IRepository<MovieEntity>, BaseRepository<MovieEntity>>();
 
+builder.Services.AddSingleton<ISQSFactory, SQSFactory>();
+builder.Services.AddScoped<ISQSService, SQSService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
+
 builder.Services.AddScoped<ShowtimeActionFilter>();
 
 builder.Services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
@@ -47,6 +54,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddOptions<WebApiClientOptions>().Bind(builder.Configuration.GetSection("WebApiClient"));
+builder.Services.AddOptions<SQSOptions>().Bind(builder.Configuration.GetSection("SQS"));
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();

@@ -11,125 +11,124 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MoviesAPIUnitTests
-{
-    [TestClass]
-    public class ShowtimeControllerUnitTests
-    {
-        private Mock<IShowtimeService> _service;
-        private Mock<IMapper> _mapper;
-        private IEnumerable<ShowtimeEntity> _showtimeEntities;
+namespace MoviesAPIUnitTests;
 
-        [TestInitialize]
-        public void Initialize()
+[TestClass]
+public class ShowtimeControllerUnitTests
+{
+    private Mock<IShowtimeService> _service;
+    private Mock<IMapper> _mapper;
+    private IEnumerable<ShowtimeEntity> _showtimeEntities;
+
+    [TestInitialize]
+    public void Initialize()
+    {
+        _showtimeEntities = new List<ShowtimeEntity>()
         {
-            _showtimeEntities = new List<ShowtimeEntity>()
+            new ShowtimeEntity()
             {
-                new ShowtimeEntity()
+                Id = 1,
+                Movie = new MovieEntity()
                 {
                     Id = 1,
-                    Movie = new MovieEntity()
-                    {
-                        Id = 1,
-                        ImdbId = "movie1",
-                        Title = "Movie 1"
-                    }
-                },
-                new ShowtimeEntity()
+                    ImdbId = "movie1",
+                    Title = "Movie 1"
+                }
+            },
+            new ShowtimeEntity()
+            {
+                Id = 2,
+                Movie = new MovieEntity()
                 {
                     Id = 2,
-                    Movie = new MovieEntity()
-                    {
-                        Id = 2,
-                        ImdbId = "movie2",
-                        Title = "Movie 2"
-                    }
+                    ImdbId = "movie2",
+                    Title = "Movie 2"
                 }
-            };
+            }
+        };
 
-            _service = new Mock<IShowtimeService>();
+        _service = new Mock<IShowtimeService>();
 
-            _mapper = new Mock<IMapper>();
-        }
+        _mapper = new Mock<IMapper>();
+    }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorShouldThrowArgumenNullExceptionWhenServiceParameterIsNull()
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void ConstructorShouldThrowArgumenNullExceptionWhenServiceParameterIsNull()
+    {
+        // Arrange
+        var subjectUnderTest = new ShowtimeController(null, _mapper.Object);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void ConstructorShouldThrowArgumenNullExceptionWhenMapperParameterIsNull()
+    {
+        // Arrange
+        var subjectUnderTest = new ShowtimeController(_service.Object, null);
+    }
+
+    [TestMethod]
+    public async Task GetShouldReturnOkObjectResult()
+    {
+        // Arrange
+        var showtimeResult = new Showtime()
         {
-            // Arrange
-            var subjectUnderTest = new ShowtimeController(null, _mapper.Object);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorShouldThrowArgumenNullExceptionWhenMapperParameterIsNull()
-        {
-            // Arrange
-            var subjectUnderTest = new ShowtimeController(_service.Object, null);
-        }
-
-        [TestMethod]
-        public async Task GetShouldReturnOkObjectResult()
-        {
-            // Arrange
-            var showtimeResult = new Showtime()
+            Id = 1,
+            Movie = new Movie()
             {
-                Id = 1,
-                Movie = new Movie()
-                {
-                    ImdbId = "movie1",
-                    Title = "Movie 1"
-                }
-            };
+                ImdbId = "movie1",
+                Title = "Movie 1"
+            }
+        };
 
-            _service.Setup(x => x.GetAsync(It.IsAny<DateTime>(), It.IsAny<string>()))
-                .ReturnsAsync((DateTime datetime, string movieTitle) => new List<ShowtimeEntity>() { _showtimeEntities.First() });
+        _service.Setup(x => x.GetAsync(It.IsAny<DateTime>(), It.IsAny<string>()))
+            .ReturnsAsync((DateTime datetime, string movieTitle) => new List<ShowtimeEntity>() { _showtimeEntities.First() });
 
-            _mapper.Setup(x => x.Map<IEnumerable<Showtime>>(It.IsAny<IEnumerable<ShowtimeEntity>>()))
-                .Returns(new List<Showtime>() { showtimeResult });
+        _mapper.Setup(x => x.Map<IEnumerable<Showtime>>(It.IsAny<IEnumerable<ShowtimeEntity>>()))
+            .Returns(new List<Showtime>() { showtimeResult });
 
-            // Act
-            var subjectUnderTest = new ShowtimeController(_service.Object, _mapper.Object);
-            var result = await subjectUnderTest.GetAsync(DateTime.Now, "movie 1");
+        // Act
+        var subjectUnderTest = new ShowtimeController(_service.Object, _mapper.Object);
+        var result = await subjectUnderTest.GetAsync(DateTime.Now, "movie 1");
 
-            // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
-        }
+        // Assert
+        Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
+    }
 
-        [TestMethod]
-        public async Task GetShouldReturnExpectedResult()
+    [TestMethod]
+    public async Task GetShouldReturnExpectedResult()
+    {
+        // Arrange
+        var showtimeResult = new Showtime()
         {
-            // Arrange
-            var showtimeResult = new Showtime()
+            Id = 1,
+            Movie = new Movie()
             {
-                Id = 1,
-                Movie = new Movie()
-                {
-                    ImdbId = "movie1",
-                    Title = "Movie 1"
-                }
-            };
+                ImdbId = "movie1",
+                Title = "Movie 1"
+            }
+        };
 
-            _service.Setup(x => x.GetAsync(It.IsAny<DateTime>(), It.IsAny<string>()))
-                .ReturnsAsync((DateTime datetime, string movieTitle) => new List<ShowtimeEntity>() { _showtimeEntities.First() });
+        _service.Setup(x => x.GetAsync(It.IsAny<DateTime>(), It.IsAny<string>()))
+            .ReturnsAsync((DateTime datetime, string movieTitle) => new List<ShowtimeEntity>() { _showtimeEntities.First() });
 
-            _mapper.Setup(x => x.Map<IEnumerable<Showtime>>(It.IsAny<IEnumerable<ShowtimeEntity>>()))
-                .Returns(new List<Showtime>() { showtimeResult });
+        _mapper.Setup(x => x.Map<IEnumerable<Showtime>>(It.IsAny<IEnumerable<ShowtimeEntity>>()))
+            .Returns(new List<Showtime>() { showtimeResult });
 
-            // Act
-            var subjectUnderTest = new ShowtimeController(_service.Object, _mapper.Object);
+        // Act
+        var subjectUnderTest = new ShowtimeController(_service.Object, _mapper.Object);
 
-            var result = await subjectUnderTest.GetAsync(DateTime.Now, "movie 1");
-            var objectResult = (OkObjectResult)result.Result;
-            var valueResult = (IEnumerable<Showtime>)objectResult.Value;
+        var result = await subjectUnderTest.GetAsync(DateTime.Now, "movie 1");
+        var objectResult = (OkObjectResult)result.Result;
+        var valueResult = (IEnumerable<Showtime>)objectResult.Value;
 
-            var expectedResult = new List<Showtime>()
-            {
-                showtimeResult
-            };
+        var expectedResult = new List<Showtime>()
+        {
+            showtimeResult
+        };
 
-            // Assert
-            CollectionAssert.AreEquivalent(expectedResult, valueResult.ToList());
-        }
+        // Assert
+        CollectionAssert.AreEquivalent(expectedResult, valueResult.ToList());
     }
 }

@@ -2,22 +2,21 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Domain.Specifications.Operators
+namespace Domain.Specifications.Operators;
+
+internal sealed class NotSpecification<T> : Specification<T>
 {
-    internal sealed class NotSpecification<T> : Specification<T>
+    private Specification<T> _specification;
+
+    public NotSpecification(Specification<T> specification)
     {
-        private Specification<T> _specification;
+        _specification = specification;
+    }
 
-        public NotSpecification(Specification<T> specification)
-        {
-            _specification = specification;
-        }
-
-        public override Expression<Func<T, bool>> ToExpression()
-        {
-            var expression = _specification.ToExpression();
-            var notExpression = Expression.Not(expression);
-            return Expression.Lambda<Func<T, bool>>(notExpression, expression.Parameters.Single());
-        }
+    public override Expression<Func<T, bool>> ToExpression()
+    {
+        var expression = _specification.ToExpression();
+        var notExpression = Expression.Not(expression);
+        return Expression.Lambda<Func<T, bool>>(notExpression, expression.Parameters.Single());
     }
 }
