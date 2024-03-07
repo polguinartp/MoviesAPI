@@ -37,10 +37,17 @@ public class IMDBWebApiClient : IIMDBWebApiClient
 
     public async Task<HttpStatusCode> GetStatus()
     {
-        HttpResponseMessage httpResponseMessage;
-        var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
-        httpResponseMessage = await _httpClient.GetAsync(path);
-        
-        return httpResponseMessage.StatusCode;
+        try
+        {
+            HttpResponseMessage httpResponseMessage;
+            var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
+            httpResponseMessage = await _httpClient.GetAsync(path);
+
+            return httpResponseMessage.StatusCode;
+        }
+        catch(HttpRequestException)
+        {
+            return HttpStatusCode.NotFound;
+        }
     }
 }

@@ -8,9 +8,9 @@ namespace Infrastructure.SQS.Services
 {
     public class SQSService : ISQSService
     {
-        private readonly ISQSFactory _sqsFactory;
+        private readonly ISQSClientFactory _sqsFactory;
 
-        public SQSService(ISQSFactory sqsFactory)
+        public SQSService(ISQSClientFactory sqsFactory)
         {
             ArgumentNullException.ThrowIfNull(sqsFactory);
 

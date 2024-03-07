@@ -6,11 +6,11 @@ using System;
 
 namespace Infrastructure.SQS.Factories
 {
-    public class SQSFactory : ISQSFactory
+    public class SQSClientFactory : ISQSClientFactory
     {
         private readonly SQSOptions _sqsOptions;
 
-        public SQSFactory(IOptions<SQSOptions> sqsOptions)
+        public SQSClientFactory(IOptions<SQSOptions> sqsOptions)
         {
             ArgumentNullException.ThrowIfNull(sqsOptions);
 

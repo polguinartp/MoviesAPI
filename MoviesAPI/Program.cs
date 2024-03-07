@@ -38,7 +38,7 @@ builder.Services.AddTransient<IRepository<ShowtimeEntity>, BaseRepository<Showti
 builder.Services.AddTransient<IRepository<AuditoriumEntity>, BaseRepository<AuditoriumEntity>>();
 builder.Services.AddTransient<IRepository<MovieEntity>, BaseRepository<MovieEntity>>();
 
-builder.Services.AddSingleton<ISQSFactory, SQSFactory>();
+builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
 builder.Services.AddScoped<ISQSService, SQSService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 

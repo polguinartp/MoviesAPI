@@ -2,7 +2,7 @@
 
 namespace Infrastructure.SQS.Factories
 {
-    public interface ISQSFactory
+    public interface ISQSClientFactory
     {
         string QueueUrl { get; }
         IAmazonSQS CreateSQSClient();
