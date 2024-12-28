@@ -28,4 +28,4 @@ runs:
         context: ./
         file: Dockerfile
         push: true
-        tags: ${{ inputs.username }}/moviesapi:latest
+        tags: ${{ inputs.username }}/moviesapi: $(date '+%Y-%m-%d %H:%M:%S')
