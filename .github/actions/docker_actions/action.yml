@@ -21,6 +21,10 @@ runs:
     - name: Generate timestamp
       run: echo "TIMESTAMP=$(date '+%Y-%m-%d-%H%M%S')" >> GITHUB_ENV
       shell: bash
+
+    - name: Debug TIMESTAMP
+      run: echo "TIMESTAMP=${{ env.TIMESTAMP }}"
+      shell: bash
       
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
