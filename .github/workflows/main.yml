@@ -5,7 +5,7 @@ on:
       - "main"
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         dotnet-version: ['8.0x']
