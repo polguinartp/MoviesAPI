@@ -27,8 +27,8 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-restore  --diag logs.txt
         
-      #- name: Docker
-         #uses: ./.github/actions/docker_actions
-        #with:
-         #username: ${{ secrets.DOCKERHUB_USERNAME }}
-         #token: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker
+        uses: ./.github/actions/docker_actions
+        with:
+         username: ${{ secrets.DOCKERHUB_USERNAME }}
+         token: ${{ secrets.DOCKERHUB_TOKEN }}
