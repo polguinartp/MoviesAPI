@@ -6,17 +6,17 @@ namespace MoviesAPI.Services;
 
 public class QueueService : IQueueService
 {
-    private readonly ISQSService _sQSService;
+    private readonly ISQSService _sqsService;
 
     public QueueService(ISQSService sqsService)
     {
         ArgumentNullException.ThrowIfNull(sqsService);
 
-        _sQSService = sqsService;
+        _sqsService = sqsService;
     }
 
     public async Task SendAsync(QueueMessage queueMessage)
     {
-        await _sQSService.EnqueueMessageAsync(queueMessage);
+        await _sqsService.EnqueueMessageAsync(queueMessage);
     }
 }

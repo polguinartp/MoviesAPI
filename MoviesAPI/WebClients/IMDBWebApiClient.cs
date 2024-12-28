@@ -27,12 +27,25 @@ public class IMDBWebApiClient : IIMDBWebApiClient
     {
         HttpResponseMessage httpResponseMessage;
         var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}/{imdbId}";
-        httpResponseMessage = await _httpClient.GetAsync(path);
 
-        httpResponseMessage.EnsureSuccessStatusCode();
+        try
+        {
+            httpResponseMessage = await _httpClient.GetAsync(path);
+            httpResponseMessage.EnsureSuccessStatusCode();
 
-        await using var stream = await httpResponseMessage.Content.ReadAsStreamAsync();
-        return await JsonSerializer.DeserializeAsync<IMDBMovieInfo>(stream);
+            await using var stream = await httpResponseMessage.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<IMDBMovieInfo>(stream);
+        }
+        catch
+        {
+            return new IMDBMovieInfo()
+            {
+                ImdbId = "-1",
+                ReleaseDate = DateTime.UtcNow,
+                Stars = "Jack Daniels",
+                Title = "booom! the movie"
+            };
+        }        
     }
 
     public async Task<HttpStatusCode> GetStatus()

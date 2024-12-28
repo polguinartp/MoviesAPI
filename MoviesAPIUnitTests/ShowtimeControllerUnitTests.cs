@@ -57,7 +57,7 @@ public class ShowtimeControllerUnitTests
     public void ConstructorShouldThrowArgumenNullExceptionWhenServiceParameterIsNull()
     {
         // Arrange
-        var subjectUnderTest = new ShowtimeController(null, _mapper.Object);
+        _ = new ShowtimeController(null, _mapper.Object);
     }
 
     [TestMethod]
@@ -65,7 +65,7 @@ public class ShowtimeControllerUnitTests
     public void ConstructorShouldThrowArgumenNullExceptionWhenMapperParameterIsNull()
     {
         // Arrange
-        var subjectUnderTest = new ShowtimeController(_service.Object, null);
+        _ = new ShowtimeController(_service.Object, null);
     }
 
     [TestMethod]
