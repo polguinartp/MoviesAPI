@@ -19,7 +19,7 @@ runs:
         username: ${{ inputs.username }}
         password: ${{ inputs.token }}
     - name: Generate timestamp
-      run: echo "TIMESTAMP=$(date '+%Y-%m-%d-%H%M%S')" >> GITHUB_ENV
+      run: echo "TIMESTAMP=$(date '+%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
       shell: bash
 
     - name: Debug TIMESTAMP
