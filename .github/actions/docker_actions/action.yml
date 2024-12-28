@@ -30,4 +30,4 @@ runs:
         context: ./
         file: Dockerfile
         push: true
-        tags: ${{ inputs.username }}/moviesapi:${{ env.$TIMESTAMP }}
+        tags: ${{ inputs.username }}/moviesapi:${{ env.TIMESTAMP }}
