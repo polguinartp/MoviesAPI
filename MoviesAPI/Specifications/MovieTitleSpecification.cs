@@ -16,6 +16,6 @@ public class MovieTitleSpecification : Specification<ShowtimeEntity>
 
     public override Expression<Func<ShowtimeEntity, bool>> ToExpression()
     {
-        return entity => entity.Movie.Title.ToUpper() == _movieTitle.ToUpper();
+        return entity => string.Equals(entity.Movie.Title, _movieTitle.ToUpper(), StringComparison.OrdinalIgnoreCase);
     }
 }

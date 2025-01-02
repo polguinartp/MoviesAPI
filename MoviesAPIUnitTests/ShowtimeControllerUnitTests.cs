@@ -23,8 +23,8 @@ public class ShowtimeControllerUnitTests
     [TestInitialize]
     public void Initialize()
     {
-        _showtimeEntities = new List<ShowtimeEntity>()
-        {
+        _showtimeEntities =
+        [
             new ShowtimeEntity()
             {
                 Id = 1,
@@ -45,10 +45,9 @@ public class ShowtimeControllerUnitTests
                     Title = "Movie 2"
                 }
             }
-        };
+        ];
 
         _service = new Mock<IShowtimeService>();
-
         _mapper = new Mock<IMapper>();
     }
 

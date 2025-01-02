@@ -51,11 +51,6 @@ public class ShowtimeController : Controller
     [ServiceFilter(typeof(ShowtimeActionFilter))]
     public async Task<ActionResult<Showtime>> PostAsync([FromBody] Showtime showtime)
     {
-        if (showtime?.Movie?.ImdbId == default)
-        {
-            return BadRequest("Movie.ImdbId property missing.");
-        }
-
         var result = await _service.CreateAsync(showtime);
         return Ok(_mapper.Map<Showtime>(result));
     }

@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Domain.Repositories;
 using Domain.Specifications;
-using Infrastructure.SQS.Services;
+//using Infrastructure.SQS.Services;
 using MoviesAPI.DTOs.API;
 using MoviesAPI.Specifications;
 using MoviesAPI.WebClients;
@@ -19,7 +19,7 @@ public class ShowtimeService : IShowtimeService
     private readonly IRepository<MovieEntity> _movieEntitiesRepository;
     private readonly IIMDBWebApiClient _webClient;
     private readonly IMapper _mapper;
-    private readonly IQueueService _queueService;
+    //private readonly IQueueService _queueService;
 
     public ShowtimeService(IRepository<ShowtimeEntity> showtimeEntitiesRepository,
         IRepository<MovieEntity> movieEntitiesRepository,
@@ -37,15 +37,15 @@ public class ShowtimeService : IShowtimeService
         _webClient = webClient;
         _mapper = mapper;
         _movieEntitiesRepository = movieEntitiesRepository;
-        _queueService = queueService;
+        //_queueService = queueService;
     }
 
     public async Task<IEnumerable<ShowtimeEntity>> GetAsync(DateTime date = default, string movieTitle = null)
     {
-        IEnumerable<ShowtimeEntity> entities = new List<ShowtimeEntity>();
+        IEnumerable<ShowtimeEntity> entities;
         var includeProperties = "Movie";
 
-        if (date == default && movieTitle == null)
+        if (date == default && string.IsNullOrEmpty(movieTitle))
         {
             entities = await _showtimeEntitiesRepository.GetCollectionAsync(includeProperties: includeProperties);
         }
@@ -56,7 +56,7 @@ public class ShowtimeService : IShowtimeService
             {
                 specification = specification.And(new ReleaseDateOlderThanSixMontsSpecification(date));
             }
-            if (movieTitle != null)
+            if (!string.IsNullOrEmpty(movieTitle))
             {
                 specification = specification.And(new MovieTitleSpecification(movieTitle));
             }
@@ -109,12 +109,13 @@ public class ShowtimeService : IShowtimeService
     {
         await _showtimeEntitiesRepository.DeleteAsync(id);
 
-        QueueMessage queueMessage = new QueueMessage()
-        {
-            Id = Guid.NewGuid(),
-            Message = $"Showtime {id} has been deleted.",
-            DateTime = DateTime.Now
-        };
-        await _queueService.SendAsync(queueMessage);
+        // aws free tier finished -> every 1M messages costs
+        //QueueMessage queueMessage = new QueueMessage()
+        //{
+        //    Id = Guid.NewGuid(),
+        //    Message = $"Showtime {id} has been deleted.",
+        //    DateTime = DateTime.Now
+        //};
+        //await _queueService.SendAsync(queueMessage);
     }
 }

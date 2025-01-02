@@ -14,7 +14,7 @@ public class MapperProfiler : Profile
         CreateMap<ShowtimeEntity, Showtime>()
             .ForMember(dest => dest.StartDate, o => o.MapFrom(src => src.StartDate.ToString()))
             .ForMember(dest => dest.EndDate, o => o.MapFrom(src => src.EndDate.ToString()))
-            .ForMember(dest => dest.Schedule, o => o.MapFrom(src => string.Join(",", src.Schedule)));
+            .ForMember(dest => dest.Schedule, o => o.MapFrom(src => string.Join(',', src.Schedule)));
         CreateMap<Showtime, ShowtimeEntity>()
             .ForMember(dest => dest.StartDate, o => o.MapFrom(src => DateTime.Parse(src.StartDate)))
             .ForMember(dest => dest.EndDate, o => o.MapFrom(src => DateTime.Parse(src.EndDate)))

@@ -29,7 +29,7 @@ public class ShowtimeServiceUnitTests
     private List<ShowtimeEntity> _showtimesEntities = TestDataProvider.Instance.GetShowtimes();
 
     [TestInitialize]
-    public void Init()
+    public void Initialize()
     {
         _mockShowtimesRepository = new Mock<IRepository<ShowtimeEntity>>();
         _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
@@ -68,18 +68,18 @@ public class ShowtimeServiceUnitTests
         });
 
         _mockWebApiClient = new Mock<IIMDBWebApiClient>();
-        _mockWebApiClient.Setup(webApiClient => webApiClient.GetMovieInfoAsync(It.Is<string>(imbdId => _moviesInfos.Any(movieInfo => movieInfo.ImdbId == imbdId)))).ReturnsAsync((string imbdId) =>
+        _mockWebApiClient.Setup(webApiClient => webApiClient.GetMovieInfoAsync(It.Is<string>(imbdId => _moviesInfos.Exists(movieInfo => movieInfo.ImdbId == imbdId)))).ReturnsAsync((string imbdId) =>
         {
             return _moviesInfos.First(movieInfo => movieInfo.ImdbId == imbdId);
         });
 
         _mockMapper = new Mock<IMapper>();
-        _mockMapper.Setup(mapper => mapper.Map<MovieEntity>(It.Is<IMDBMovieInfo>(movieInfo => _moviesEntities.Any(movie => movie.ImdbId == movieInfo.ImdbId)))).Returns((IMDBMovieInfo movie) =>
+        _mockMapper.Setup(mapper => mapper.Map<MovieEntity>(It.Is<IMDBMovieInfo>(movieInfo => _moviesEntities.Exists(movie => movie.ImdbId == movieInfo.ImdbId)))).Returns((IMDBMovieInfo movie) =>
         {
             return _moviesEntities.First(movieEntity => movieEntity.ImdbId.Equals(movie.ImdbId));
         });
 
-        _mockMapper.Setup(mapper => mapper.Map<ShowtimeEntity>(It.Is<Showtime>(showtime => _showtimesEntities.Any(showtimeEntity => showtimeEntity.Id == showtime.Id)))).Returns((Showtime showtime) =>
+        _mockMapper.Setup(mapper => mapper.Map<ShowtimeEntity>(It.Is<Showtime>(showtime => _showtimesEntities.Exists(showtimeEntity => showtimeEntity.Id == showtime.Id)))).Returns((Showtime showtime) =>
         {
             return _showtimesEntities.First(showtimeEntity => showtimeEntity.Id == showtime.Id);
         });
@@ -168,7 +168,7 @@ public class ShowtimeServiceUnitTests
         // Arrange
         var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object, _mockQueueService.Object);
         var title = "The Best Movie Ever 3";
-        var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper()).ToList();
+        var expectedResult = _showtimesEntities.Where(showtime => string.Equals(showtime.Movie.Title, title, StringComparison.OrdinalIgnoreCase)).ToList();
 
         _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
             It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),
@@ -189,7 +189,7 @@ public class ShowtimeServiceUnitTests
         var subjectUnderTest = new ShowtimeService(_mockShowtimesRepository.Object, _mockMoviesRepository.Object, _mockWebApiClient.Object, _mockMapper.Object, _mockQueueService.Object);
         var date = DateTime.Parse("2022-05-06");
         var title = "The Best Movie Ever 3";
-        var expectedResult = _showtimesEntities.Where(showtime => showtime.Movie.Title.ToUpper() == title.ToUpper() && date >= showtime.StartDate && date <= showtime.EndDate).ToList();
+        var expectedResult = _showtimesEntities.Where(showtime => string.Equals(showtime.Movie.Title, title, StringComparison.OrdinalIgnoreCase) && date >= showtime.StartDate && date <= showtime.EndDate).ToList();
 
         _mockShowtimesRepository.Setup(repository => repository.GetCollectionAsync(It.IsAny<Expression<Func<ShowtimeEntity, bool>>>(),
             It.IsAny<Func<IQueryable<ShowtimeEntity>, IOrderedQueryable<ShowtimeEntity>>>(),

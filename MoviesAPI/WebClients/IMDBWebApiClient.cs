@@ -45,17 +45,15 @@ public class IMDBWebApiClient : IIMDBWebApiClient
                 Stars = "Jack Daniels",
                 Title = "booom! the movie"
             };
-        }        
+        }
     }
 
     public async Task<HttpStatusCode> GetStatus()
     {
         try
         {
-            HttpResponseMessage httpResponseMessage;
             var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
-            httpResponseMessage = await _httpClient.GetAsync(path);
-
+            HttpResponseMessage httpResponseMessage = await _httpClient.GetAsync(path);
             return httpResponseMessage.StatusCode;
         }
         catch(HttpRequestException)
