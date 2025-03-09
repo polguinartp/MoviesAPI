@@ -38,6 +38,7 @@ public class IMDBWebApiClient : IIMDBWebApiClient
         }
         catch
         {
+            // return dummy object because imdb site is down
             return new IMDBMovieInfo()
             {
                 ImdbId = "-1",

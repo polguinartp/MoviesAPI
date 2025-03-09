@@ -21,7 +21,7 @@ public class MovieEntity
         {
             return true;
         }
-        if (!(obj is MovieEntity))
+        if (obj is not MovieEntity)
         {
             return false;
         }
