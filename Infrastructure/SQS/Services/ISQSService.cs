@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Domain.Queues;
+using System.Threading.Tasks;
 
 namespace Infrastructure.SQS.Services
 {

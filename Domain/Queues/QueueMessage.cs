@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.SQS.Services
+namespace Domain.Queues
 {
     public class QueueMessage
     {
