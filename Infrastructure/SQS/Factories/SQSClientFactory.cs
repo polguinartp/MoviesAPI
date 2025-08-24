@@ -1,4 +1,5 @@
 ﻿using Amazon;
+using Amazon.Runtime;
 using Amazon.SQS;
 using Infrastructure.Options;
 using Microsoft.Extensions.Options;
@@ -21,13 +22,15 @@ namespace Infrastructure.SQS.Factories
 
         public IAmazonSQS CreateSQSClient()
         {
+            // fill with key and secret
+            var credentials = new BasicAWSCredentials("", "");
             var config = new AmazonSQSConfig()
             {
                 RegionEndpoint = RegionEndpoint.GetBySystemName(_sqsOptions.Region),
                 ServiceURL = _sqsOptions.QueueUrl
             };
 
-            return new AmazonSQSClient(config);
+            return new AmazonSQSClient(credentials, config);
         }
     }
 }
