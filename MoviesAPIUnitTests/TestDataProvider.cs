@@ -11,7 +11,7 @@ namespace MoviesAPIUnitTests;
 public class TestDataProvider
 {
     private static TestDataProvider _instance;
-    private IMapper _mapper;
+    private Mapper _mapper;
     private List<IMDBMovieInfo> _moviesInfo;
     private List<MovieEntity> _moviesEntities;
     private List<ShowtimeEntity> _showtimeEntities;
