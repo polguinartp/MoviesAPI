@@ -4,8 +4,6 @@ namespace MoviesAPI.DTOs.API.Requests;
 
 public class ShowtimeRequest
 {
-	public int Id { get; set; }
-
 	[Required]
 	public string StartDate { get; set; }
 

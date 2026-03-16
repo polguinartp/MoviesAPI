@@ -12,24 +12,6 @@ public class Movie
 	public int ShowtimeId { get; set; }
 	public Showtime Showtime { get; set; }
 
-	public override bool Equals(object obj)
-	{
-		if (obj == null)
-		{
-			return false;
-		}
-		if (ReferenceEquals(obj, this))
-		{
-			return true;
-		}
-		if (obj is not Movie)
-		{
-			return false;
-		}
-
-		return ImdbId == ((Movie)obj).ImdbId;
-	}
-
 	public override int GetHashCode()
 	{
 		return ImdbId.GetHashCode();

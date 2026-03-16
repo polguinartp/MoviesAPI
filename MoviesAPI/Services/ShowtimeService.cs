@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Domain.Entities;
-using Domain.Queues;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using MoviesAPI.DTOs.API.Requests;
@@ -50,7 +49,7 @@ public class ShowtimeService(IIMDBWebApiClient webClient, IMapper mapper, IQueue
 		var movieInfo = await webClient.GetMovieInfoAsync(showtimeRequest.MovieId);
 		showtimeEntity.Movie = mapper.Map<Movie>(movieInfo);
 
-		var existingMovie = await dbContext.Movies.AsNoTracking().FirstOrDefaultAsync(x => x.Equals(showtimeEntity.Movie));
+		var existingMovie = await dbContext.Movies.AsNoTracking().FirstOrDefaultAsync(x => x.Title.Equals(showtimeEntity.Movie.Title, StringComparison.OrdinalIgnoreCase));
 		if (existingMovie != null)
 		{
 			showtimeEntity.Movie = existingMovie;
@@ -62,9 +61,9 @@ public class ShowtimeService(IIMDBWebApiClient webClient, IMapper mapper, IQueue
 		return mapper.Map<ShowtimeResponse>(showtimeEntity);
 	}
 
-	public async Task<ShowtimeResponse> UpdateAsync(ShowtimeRequest showtimeRequest)
+	public async Task<ShowtimeResponse> UpdateAsync(int id, ShowtimeRequest showtimeRequest)
 	{
-		var showtime = await dbContext.Showtimes.FirstOrDefaultAsync(x => x.Id == showtimeRequest.Id);
+		var showtime = await dbContext.Showtimes.Include(x => x.Movie).FirstOrDefaultAsync(x => x.Id == id);
 		if (showtime is null)
 		{
 			return null!;
@@ -85,14 +84,21 @@ public class ShowtimeService(IIMDBWebApiClient webClient, IMapper mapper, IQueue
 
 	public async Task DeleteAsync(int id)
 	{
-		await dbContext.Showtimes.Where(x => x.Id == id).ExecuteDeleteAsync();
-
-		// aws free tier finished -> every 1M messages costs
-		var queueMessage = new QueueMessage()
+		var showtime = await dbContext.Showtimes.FirstOrDefaultAsync(x => x.Id == id);
+		if (showtime is null)
 		{
-			Message = $"Showtime {id} has been deleted.",
-			DateTime = DateTime.Now
-		};
-		await queueService.SendAsync(queueMessage);
+			return;
+		}
+
+		dbContext.Showtimes.Remove(showtime);
+		await dbContext.SaveChangesAsync();
+
+		// IMPORTANT: AWS Free Tier is expired; every 1M messages is charged.
+		//var queueMessage = new QueueMessage()
+		//{
+		//	Message = $"Showtime {id} has been deleted.",
+		//	DateTime = DateTime.Now
+		//};
+		//await queueService.SendAsync(queueMessage);
 	}
 }

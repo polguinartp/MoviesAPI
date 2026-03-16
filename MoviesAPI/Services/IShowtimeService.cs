@@ -14,7 +14,7 @@ public interface IShowtimeService
 
 	Task<ShowtimeResponse> CreateAsync(ShowtimeRequest entity);
 
-	Task<ShowtimeResponse> UpdateAsync(ShowtimeRequest entity);
+	Task<ShowtimeResponse> UpdateAsync(int id, ShowtimeRequest entity);
 
 	Task DeleteAsync(int id);
 }

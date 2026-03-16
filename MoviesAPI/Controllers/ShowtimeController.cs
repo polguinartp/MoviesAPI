@@ -18,7 +18,7 @@ public class ShowtimeController(IShowtimeService service, IMapper mapper) : Cont
 {	
 	[HttpGet]
 	//[Authorize(Roles = Constants.Roles.Read)]
-	public async Task<ActionResult<IEnumerable<ShowtimeResponse>>> GetAsync([FromQuery] DateTime? date, [FromQuery] string movieTitle)
+	public async Task<ActionResult<IEnumerable<ShowtimeResponse>>> GetAsync([FromQuery] DateTime? date, [FromQuery] string? movieTitle)
 	{
 		var entities = await service.GetAsync(date, movieTitle);
 		var result = entities;
@@ -41,16 +41,16 @@ public class ShowtimeController(IShowtimeService service, IMapper mapper) : Cont
 		return Ok(result);
 	}
 
-	[HttpPut]
+	[HttpPut("{id}")]
 	//[Authorize(Roles = Constants.Roles.Write)]
-	public async Task<ActionResult<ShowtimeResponse>> Put([FromBody] ShowtimeRequest showtime)
+	public async Task<ActionResult<ShowtimeResponse>> Put([FromRoute] int id, [FromBody] ShowtimeRequest showtime)
 	{
-		if (await service.GetByIdAsync(showtime.Id) is null)
+		if (await service.GetByIdAsync(id) is null)
 		{
 			return NotFound($"Not found Showtime with provided id");
 		}
 
-		var result = await service.UpdateAsync(showtime);
+		var result = await service.UpdateAsync(id, showtime);
 		return Ok(result);
 	}
 
