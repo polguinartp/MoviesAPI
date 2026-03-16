@@ -4,5 +4,5 @@ namespace MoviesAPI.Auth;
 
 public interface ICustomAuthenticationTokenService
 {
-    ClaimsPrincipal Read(string value);
+	ClaimsPrincipal Read(string value);
 }

@@ -5,5 +5,5 @@ namespace MoviesAPI.Services;
 
 public interface IQueueService
 {
-    Task SendAsync(QueueMessage queueMessage);
+	Task SendAsync(QueueMessage queueMessage);
 }

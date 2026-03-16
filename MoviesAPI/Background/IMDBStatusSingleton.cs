@@ -1,20 +1,14 @@
-﻿using MoviesAPI.DTOs.API;
+﻿using MoviesAPI.DTOs.API.Responses;
 
 namespace MoviesAPI.Background;
 
-/// <summary>
-/// Class that represents the current status information for the IMDB Api.
-/// </summary>
 public class IMDBStatusSingleton
 {
-    private readonly static IMDBStatusSingleton _instance = new IMDBStatusSingleton();
+	private readonly static IMDBStatusSingleton _instance = new();
 
-    private IMDBStatusSingleton() { }
+	private IMDBStatusSingleton() { }
 
-    public static IMDBStatusSingleton Instance => _instance;
+	public static IMDBStatusSingleton Instance => _instance;
 
-    /// <summary>
-    /// Current Status of IMDB Api
-    /// </summary>
-    public IMDBStatus Status { get; set; }
+	public IMDBStatusResponse Status { get; set; }
 }

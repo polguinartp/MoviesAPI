@@ -1,10 +1,6 @@
-using Domain.Entities;
-using Domain.Repositories;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using MoviesAPI.ActionFilters;
 using MoviesAPI.Auth;
 using MoviesAPI.Exceptions;
 using MoviesAPI.Middlewares;
@@ -17,57 +13,52 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using MoviesAPI.Background;
 using Serilog;
-using MoviesAPI.Database;
 using Infrastructure.Options;
 using Infrastructure.SQS.Factories;
 using Infrastructure.SQS.Services;
+using MoviesAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<CinemaContext>(options =>
+builder.Services.AddDbContext<CinemaDbContext>(options =>
 {
-    options.UseInMemoryDatabase("CinemaDb")
-        .EnableSensitiveDataLogging()
-        .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+	options.UseInMemoryDatabase("CinemaDb")
+			.EnableSensitiveDataLogging()
+			.ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
 });
+builder.Services.InitializeMockDatabase();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
 builder.Services.AddTransient<IShowtimeService, ShowtimeService>();
-builder.Services.AddTransient<IRepository<ShowtimeEntity>, BaseRepository<ShowtimeEntity>>();
-builder.Services.AddTransient<IRepository<AuditoriumEntity>, BaseRepository<AuditoriumEntity>>();
-builder.Services.AddTransient<IRepository<MovieEntity>, BaseRepository<MovieEntity>>();
+builder.Services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
+builder.Services.RegisterOptions<IMDBWebApiClientOptions>(builder.Configuration.GetSection("IMDBWebApiClient"));
 
-builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
 builder.Services.AddScoped<ISQSService, SQSService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
-
-builder.Services.AddScoped<ShowtimeActionFilter>();
+builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
+builder.Services.RegisterOptions<SQSOptions>(builder.Configuration.GetSection("SQS"));
 
 builder.Services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
-
 builder.Services.AddAuthentication(options =>
 {
-    options.AddScheme<CustomAuthenticationHandler>(CustomAuthenticationSchemeOptions.AuthenticationScheme, CustomAuthenticationSchemeOptions.AuthenticationScheme);
-    options.RequireAuthenticatedSignIn = true;
-    options.DefaultScheme = CustomAuthenticationSchemeOptions.AuthenticationScheme;
+	options.AddScheme<CustomAuthenticationHandler>(CustomAuthenticationSchemeOptions.AuthenticationScheme, CustomAuthenticationSchemeOptions.AuthenticationScheme);
+	options.RequireAuthenticatedSignIn = true;
+	options.DefaultScheme = CustomAuthenticationSchemeOptions.AuthenticationScheme;
 });
-
-builder.Services.AddOptions<WebApiClientOptions>().Bind(builder.Configuration.GetSection("WebApiClient"));
-builder.Services.AddOptions<SQSOptions>().Bind(builder.Configuration.GetSection("SQS"));
-
-builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<IMDBStatusBackgroundTask>();
 builder.Host.UseSerilog();
+
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseMiddleware<RequestLoggerMiddleware>();
@@ -80,7 +71,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-SampleData.Initialize(app);
 
 app.Run();

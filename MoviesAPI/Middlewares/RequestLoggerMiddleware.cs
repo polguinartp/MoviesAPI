@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MoviesAPI.Middlewares;
 
 /// <summary>
-/// Middleware class that, if injected in the pipeline, it logs all the requests times.
+/// Middleware class that, if injected in the pipeline, logs all the requests times.
 /// </summary>
 public class RequestLoggerMiddleware
 {

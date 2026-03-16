@@ -1,39 +1,23 @@
-﻿using Microsoft.Extensions.Options;
-using MoviesAPI.DTOs.IMDB;
-using MoviesAPI.Extensions;
+﻿using MoviesAPI.DTOs.IMDB;
 using MoviesAPI.Options;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MoviesAPI.WebClients;
 
-public class IMDBWebApiClient : IIMDBWebApiClient
+public class IMDBWebApiClient(IMDBWebApiClientOptions options, HttpClient httpClient) : IIMDBWebApiClient
 {
-	private readonly WebApiClientOptions _options;
-	private readonly HttpClient _httpClient;
-
-	public IMDBWebApiClient(IOptions<WebApiClientOptions> options, HttpClient httpClient)
-	{
-
-		options.ThrowIfNull();
-		httpClient.ThrowIfNull();
-
-		_options = options.Value;
-		_httpClient = httpClient;
-	}
-
 	public async Task<IMDBMovieInfo> GetMovieInfoAsync(string imdbId)
 	{
 		HttpResponseMessage httpResponseMessage;
-		var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}/{imdbId}";
+		var path = $"{options.Url}/{options.ApiKey}/{imdbId}";
 
 		try
 		{
-			httpResponseMessage = await _httpClient.GetAsync(path);
+			httpResponseMessage = await httpClient.GetAsync(path);
 			httpResponseMessage.EnsureSuccessStatusCode();
 
 			await using var stream = await httpResponseMessage.Content.ReadFromJsonAsync<IMDBMovieInfo>();
@@ -52,12 +36,12 @@ public class IMDBWebApiClient : IIMDBWebApiClient
 		}
 	}
 
-	public async Task<HttpStatusCode> GetStatus()
+	public async Task<HttpStatusCode> GetStatusAsync()
 	{
 		try
 		{
-			var path = $"{_options.IMDBUrl}/{_options.IMDBApiKey}";
-			HttpResponseMessage httpResponseMessage = await _httpClient.GetAsync(path);
+			var path = $"{options.Url}/{options.ApiKey}";
+			HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(path);
 			return httpResponseMessage.StatusCode;
 		}
 		catch (HttpRequestException)

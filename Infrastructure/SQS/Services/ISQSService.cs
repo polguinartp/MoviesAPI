@@ -1,10 +1,9 @@
 ﻿using Domain.Queues;
 using System.Threading.Tasks;
 
-namespace Infrastructure.SQS.Services
+namespace Infrastructure.SQS.Services;
+
+public interface ISQSService
 {
-    public interface ISQSService
-    {
-        Task EnqueueMessageAsync(QueueMessage message);
-    }
+	Task EnqueueMessageAsync(QueueMessage message);
 }

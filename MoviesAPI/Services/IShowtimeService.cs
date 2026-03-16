@@ -1,49 +1,20 @@
-﻿using Domain.Entities;
-using MoviesAPI.DTOs.API;
+﻿using MoviesAPI.DTOs.API.Requests;
+using MoviesAPI.DTOs.API.Responses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MoviesAPI.Services;
 
-/// <summary>
-/// Specifies the contract for a service that implements operations to manage Showtime entities in the application.
-/// </summary>
 public interface IShowtimeService
 {
-    /// <summary>
-    /// Returns all the Showtime entities in the application.
-    /// </summary>
-    /// <param name="date">Filter Showtime entities for a date between their StartDate and EndDate.</param>
-    /// <param name="movieTitle">Filter Showtime entities for Movies which the specified title.</param>
-    /// <returns></returns>
-    Task<IEnumerable<ShowtimeEntity>> GetAsync(DateTime date, string movieTitle);
+	Task<List<ShowtimeResponse>> GetAsync(DateTime? date, string? movieTitle);
 
-    /// <summary>
-    /// Returns the Showtime entity with the specified id or null if it is not found.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    Task<ShowtimeEntity> GetByIdAsync(int id);
+	Task<ShowtimeResponse> GetByIdAsync(int id);
 
-    /// <summary>
-    /// Adds a new Showtime entity to the application from a provided Showtime DTO object.
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    Task<ShowtimeEntity> CreateAsync(Showtime entity);
+	Task<ShowtimeResponse> CreateAsync(ShowtimeRequest entity);
 
-    /// <summary>
-    /// Updates an existing Showtime entity in the application from a provided Showtime DTO object.
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    Task<ShowtimeEntity> UpdateAsync(Showtime entity);
+	Task<ShowtimeResponse> UpdateAsync(ShowtimeRequest entity);
 
-    /// <summary>
-    /// Removes an existing Showtime entity from the application with the specified id.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    Task DeleteAsync(int id);
+	Task DeleteAsync(int id);
 }

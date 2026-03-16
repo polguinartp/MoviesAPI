@@ -4,5 +4,5 @@ namespace MoviesAPI.Auth;
 
 public class CustomAuthenticationSchemeOptions : AuthenticationSchemeOptions
 {
-    public const string AuthenticationScheme = "CustomAuthentication";
+	public const string AuthenticationScheme = "CustomAuthentication";
 }

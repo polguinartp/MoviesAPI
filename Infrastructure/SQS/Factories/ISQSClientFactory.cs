@@ -1,10 +1,8 @@
 ﻿using Amazon.SQS;
 
-namespace Infrastructure.SQS.Factories
+namespace Infrastructure.SQS.Factories;
+
+public interface ISQSClientFactory
 {
-    public interface ISQSClientFactory
-    {
-        string QueueUrl { get; }
-        IAmazonSQS CreateSQSClient();
-    }
+	IAmazonSQS CreateSQSClient();
 }

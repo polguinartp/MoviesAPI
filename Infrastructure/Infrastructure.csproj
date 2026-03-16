@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.400.70" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.2.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.11" />
   </ItemGroup>
 

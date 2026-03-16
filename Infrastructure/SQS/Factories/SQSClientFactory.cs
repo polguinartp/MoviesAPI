@@ -2,35 +2,22 @@
 using Amazon.Runtime;
 using Amazon.SQS;
 using Infrastructure.Options;
-using Microsoft.Extensions.Options;
-using System;
 
-namespace Infrastructure.SQS.Factories
+namespace Infrastructure.SQS.Factories;
+
+public class SQSClientFactory(SQSOptions options) : ISQSClientFactory
 {
-    public class SQSClientFactory : ISQSClientFactory
-    {
-        private readonly SQSOptions _sqsOptions;
+	public string QueueUrl => options.QueueUrl;
 
-        public SQSClientFactory(IOptions<SQSOptions> sqsOptions)
-        {
-            ArgumentNullException.ThrowIfNull(sqsOptions);
+	public IAmazonSQS CreateSQSClient()
+	{
+		var credentials = new BasicAWSCredentials(options.AwsAccessKey, options.AwsSecretKey);
+		var config = new AmazonSQSConfig()
+		{
+			RegionEndpoint = RegionEndpoint.GetBySystemName(options.Region),
+			ServiceURL = options.QueueUrl
+		};
 
-            _sqsOptions = sqsOptions.Value;
-        }
-
-        public string QueueUrl => _sqsOptions.QueueUrl;
-
-        public IAmazonSQS CreateSQSClient()
-        {
-            // fill with key and secret
-            var credentials = new BasicAWSCredentials("", "");
-            var config = new AmazonSQSConfig()
-            {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(_sqsOptions.Region),
-                ServiceURL = _sqsOptions.QueueUrl
-            };
-
-            return new AmazonSQSClient(credentials, config);
-        }
-    }
+		return new AmazonSQSClient(credentials, config);
+	}
 }
