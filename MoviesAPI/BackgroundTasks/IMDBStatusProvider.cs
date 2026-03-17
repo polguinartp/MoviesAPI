@@ -1,4 +1,4 @@
-﻿using MoviesAPI.DTOs.API.Responses;
+﻿using MoviesAPI.DTOs.Responses;
 
 namespace MoviesAPI.Background;
 

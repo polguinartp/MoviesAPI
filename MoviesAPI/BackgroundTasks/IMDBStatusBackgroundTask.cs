@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using MoviesAPI.DTOs.API.Responses;
+using MoviesAPI.DTOs.Responses;
 using MoviesAPI.Options;
 using MoviesAPI.WebClients;
 using System;
@@ -20,13 +20,13 @@ public class IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IMDBWebApi
 		_timer = new Timer(async o =>
 		{
 			var lastCall = DateTime.Now;
-			var status = await webApiClient.GetStatusAsync();
+			//var status = await webApiClient.GetStatusAsync();
+			var status = System.Net.HttpStatusCode.OK;
 
-			var newStatus = new IMDBStatusResponse()
-			{
-				LastCall = lastCall,
-				Up = status == System.Net.HttpStatusCode.OK
-			};
+			var newStatus = new IMDBStatusResponse(
+				Up: status == System.Net.HttpStatusCode.OK,
+				LastCall: lastCall
+			);
 
 			iMDBStatusService.Status = newStatus;
 		},

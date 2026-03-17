@@ -29,7 +29,6 @@ builder.Services.InitializeMockDatabase();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddTransient<IShowtimeService, ShowtimeService>();
 builder.Services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
 builder.Services.RegisterOptions<IMDBWebApiClientOptions>(builder.Configuration.GetSection("IMDBWebApiClient"));
 
@@ -39,6 +38,8 @@ builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
 builder.Services.RegisterOptions<SQSOptions>(builder.Configuration.GetSection("SQS"));
 
 builder.Services.AddSingleton<IMDBStatusProvider>();
+
+builder.Services.AddMediator(x => x.ServiceLifetime = ServiceLifetime.Scoped);
 
 builder.Services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
 builder.Services.AddAuthentication(options =>

@@ -12,41 +12,39 @@ public class IMDBWebApiClient(IMDBWebApiClientOptions options, HttpClient httpCl
 {
 	public async Task<IMDBMovieInfo> GetMovieInfoAsync(string imdbId)
 	{
-		HttpResponseMessage httpResponseMessage;
-		var path = $"{options.Url}/{options.ApiKey}/{imdbId}";
+		//HttpResponseMessage httpResponseMessage;
+		//var path = $"{options.Url}/{options.ApiKey}/{imdbId}";
 
-		httpResponseMessage = await httpClient.GetAsync(path);
+		//httpResponseMessage = await httpClient.GetAsync(path);
 
-		if (httpResponseMessage.IsSuccessStatusCode)
-		{
-			await using var result = await httpResponseMessage.Content.ReadFromJsonAsync<IMDBMovieInfo>();
-			return result!;
-		}
+		//if (httpResponseMessage.IsSuccessStatusCode)
+		//{
+		//	var result = await httpResponseMessage.Content.ReadFromJsonAsync<IMDBMovieInfo>();
+		//	return result!;
+		//}
 
 		// Return dummy object if IMDB website is not available
 		return imdbId switch
 		{
-			"tt0111161" => new IMDBMovieInfo()
-			{
-				ImdbId = "tt0111161",
-				ReleaseDate = new DateTime(1994, 9, 22),
-				Stars = "Tim Robbins, Morgan Freeman, Bob Gunton",
-				Title = "The Shawshank Redemption"
-			},
-			"tt0068646" => new IMDBMovieInfo()
-			{
-				ImdbId = "tt0068646",
-				ReleaseDate = new DateTime(1972, 3, 24),
-				Stars = "Marlon Brando, Al Pacino, James Caan",
-				Title = "The Godfather"
-			},
-			"tt0468569" => new IMDBMovieInfo()
-			{
-				ImdbId = "tt0468569",
-				ReleaseDate = new DateTime(2008, 7, 18),
-				Stars = "Christian Bale, Heath Ledger, Aaron Eckhart",
-				Title = "The Dark Knight"
-			}
+			"tt0111161" => new IMDBMovieInfo(
+				Title: "The Shawshank Redemption",
+				ReleaseDate: new DateTime(1994, 9, 22),
+				ImdbId: "tt0111161",
+				Stars: "Tim Robbins, Morgan Freeman, Bob Gunton"
+			),
+			"tt0068646" => new IMDBMovieInfo(
+				Title: "The Godfather",
+				ReleaseDate: new DateTime(1972, 3, 24),
+				ImdbId: "tt0068646",
+				Stars: "Marlon Brando, Al Pacino, James Caan"
+			),
+			"tt0468569" => new IMDBMovieInfo(
+				Title: "The Dark Knight",
+				ReleaseDate: new DateTime(2008, 7, 18),
+				ImdbId: "tt0468569",
+				Stars: "Christian Bale, Heath Ledger, Aaron Eckhart"
+			),
+			_ => null!
 		};
 	}
 
