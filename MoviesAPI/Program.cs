@@ -2,7 +2,6 @@ using Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using MoviesAPI.Auth;
-using MoviesAPI.Exceptions;
 using MoviesAPI.Middlewares;
 using MoviesAPI.Options;
 using MoviesAPI.Services;
@@ -38,6 +37,8 @@ builder.Services.AddScoped<ISQSService, SQSService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
 builder.Services.RegisterOptions<SQSOptions>(builder.Configuration.GetSection("SQS"));
+
+builder.Services.AddSingleton<IMDBStatusProvider>();
 
 builder.Services.AddSingleton<ICustomAuthenticationTokenService, CustomAuthenticationTokenService>();
 builder.Services.AddAuthentication(options =>

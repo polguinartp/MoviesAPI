@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using MoviesAPI.DTOs.API.Responses;
 using MoviesAPI.Options;
 using MoviesAPI.WebClients;
@@ -12,7 +11,7 @@ namespace MoviesAPI.Background;
 /// <summary>
 /// Represents a class that checks the status for the IMDB Api in a background task.
 /// </summary>
-public class IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IMDBWebApiClientOptions options) : IHostedService, IDisposable
+public class IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IMDBWebApiClientOptions options, IMDBStatusProvider iMDBStatusService) : IHostedService, IDisposable
 {
 	private Timer _timer;
 
@@ -29,7 +28,7 @@ public class IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IMDBWebApi
 				Up = status == System.Net.HttpStatusCode.OK
 			};
 
-			IMDBStatusSingleton.Instance.Status = newStatus;
+			iMDBStatusService.Status = newStatus;
 		},
 		null,
 		TimeSpan.Zero,

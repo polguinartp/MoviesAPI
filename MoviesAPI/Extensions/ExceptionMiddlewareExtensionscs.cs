@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 
-namespace MoviesAPI.Exceptions;
+namespace MoviesAPI.Extensions;
 
-public record ErrorInfo (int StatusCode, string Message);
+public record ErrorInfo(int StatusCode, string Message);
 
 /// <summary>
 /// Represents a class that configures the Exception middleware.
@@ -21,17 +21,17 @@ public static class ExceptionMiddlewareExtensions
 		app.UseExceptionHandler(appError =>
 		{
 			appError.Run(async context =>
-					{
-					context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-					context.Response.ContentType = "application/json";
+			{
+				context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+				context.Response.ContentType = "application/json";
 
-					var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-					if (contextFeature != null)
-					{
-						var errorInfo = new ErrorInfo(context.Response.StatusCode, $"Internal Server Error: {contextFeature.Error.Message}");
-						await context.Response.WriteAsync(errorInfo.ToString());
-					}
-				});
+				var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+				if (contextFeature != null)
+				{
+					var errorInfo = new ErrorInfo(context.Response.StatusCode, $"Internal Server Error: {contextFeature.Error.Message}");
+					await context.Response.WriteAsync(errorInfo.ToString());
+				}
+			});
 		});
 	}
 }
