@@ -38,6 +38,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         token: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository_name: "MoviesAPI"
+        repository_name: "moviesapi"
         context: "./MoviesAPI/"
         dockerfile: "./MoviesAPI/Dockerfile"
