@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="curls.md" />
+    <File Path="cUrls.txt" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="MoviesAPI.Tests/MoviesAPI.Tests.csproj" />
+  <Project Path="MoviesAPI/MoviesAPI.csproj" />
+</Solution>
