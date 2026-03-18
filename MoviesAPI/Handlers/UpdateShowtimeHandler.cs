@@ -9,29 +9,28 @@ using MoviesAPI.WebClients;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MoviesAPI.Handlers
+namespace MoviesAPI.Handlers;
+
+public class UpdateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webClient) : IRequestHandler<UpdateShowtimeRequest, ShowtimeResponse>
 {
-	public class UpdateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webClient) : IRequestHandler<UpdateShowtimeRequest, ShowtimeResponse>
+	public async ValueTask<ShowtimeResponse> Handle(UpdateShowtimeRequest request, CancellationToken cancellationToken)
 	{
-		public async ValueTask<ShowtimeResponse> Handle(UpdateShowtimeRequest request, CancellationToken cancellationToken)
+		var showtime = await dbContext.Showtimes.Include(x => x.Movie).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+		if (showtime is null)
 		{
-			var showtime = await dbContext.Showtimes.Include(x => x.Movie).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-			if (showtime is null)
-			{
-				return null!;
-			}
-
-			mapper.Map(request.ShowtimeRequest, showtime);
-
-			if (request.ShowtimeRequest.MovieId is not null && request.ShowtimeRequest.MovieId != showtime.Movie.ImdbId)
-			{
-				var movieInfo = await webClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
-				showtime.Movie = mapper.Map<Movie>(movieInfo);
-			}
-
-			await dbContext.SaveChangesAsync(cancellationToken);
-
-			return mapper.Map<ShowtimeResponse>(showtime);
+			return null!;
 		}
+
+		mapper.Map(request.ShowtimeRequest, showtime);
+
+		if (request.ShowtimeRequest.MovieId is not null && request.ShowtimeRequest.MovieId != showtime.Movie.ImdbId)
+		{
+			var movieInfo = await webClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
+			showtime.Movie = mapper.Map<Movie>(movieInfo);
+		}
+
+		await dbContext.SaveChangesAsync(cancellationToken);
+
+		return mapper.Map<ShowtimeResponse>(showtime);
 	}
 }

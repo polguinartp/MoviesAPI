@@ -10,27 +10,26 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MoviesAPI.Handlers
+namespace MoviesAPI.Handlers;
+
+public class CreateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webClient) : IRequestHandler<CreateShowtimeRequest, ShowtimeResponse>
 {
-	public class CreateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webClient) : IRequestHandler<CreateShowtimeRequest, ShowtimeResponse>
+	public async ValueTask<ShowtimeResponse> Handle(CreateShowtimeRequest request, CancellationToken cancellationToken)
 	{
-		public async ValueTask<ShowtimeResponse> Handle(CreateShowtimeRequest request, CancellationToken cancellationToken)
+		var showtimeEntity = mapper.Map<Showtime>(request.ShowtimeRequest);
+
+		var movieInfo = await webClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
+		showtimeEntity.Movie = mapper.Map<Movie>(movieInfo);
+
+		var existingMovie = await dbContext.Movies.AsNoTracking().FirstOrDefaultAsync(x => x.Title.Equals(showtimeEntity.Movie.Title, StringComparison.OrdinalIgnoreCase), cancellationToken);
+		if (existingMovie != null)
 		{
-			var showtimeEntity = mapper.Map<Showtime>(request.ShowtimeRequest);
-
-			var movieInfo = await webClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
-			showtimeEntity.Movie = mapper.Map<Movie>(movieInfo);
-
-			var existingMovie = await dbContext.Movies.AsNoTracking().FirstOrDefaultAsync(x => x.Title.Equals(showtimeEntity.Movie.Title, StringComparison.OrdinalIgnoreCase), cancellationToken);
-			if (existingMovie != null)
-			{
-				showtimeEntity.Movie = existingMovie;
-			}
-
-			await dbContext.Showtimes.AddAsync(showtimeEntity, cancellationToken);
-			await dbContext.SaveChangesAsync(cancellationToken);
-
-			return mapper.Map<ShowtimeResponse>(showtimeEntity);
+			showtimeEntity.Movie = existingMovie;
 		}
+
+		await dbContext.Showtimes.AddAsync(showtimeEntity, cancellationToken);
+		await dbContext.SaveChangesAsync(cancellationToken);
+
+		return mapper.Map<ShowtimeResponse>(showtimeEntity);
 	}
 }
