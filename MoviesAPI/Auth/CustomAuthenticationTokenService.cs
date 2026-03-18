@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Security.Claims;
+using System.Text;
 
 namespace MoviesAPI.Auth;
 
@@ -9,18 +10,19 @@ public class CustomAuthenticationTokenService : ICustomAuthenticationTokenServic
 	{
 		try
 		{
-			var decodedBytes = System.Convert.FromBase64String(value);
-			var decodedString = System.Text.Encoding.UTF8.GetString(decodedBytes);
+			var decodedBytes = Convert.FromBase64String(value);
+			var decodedString = Encoding.UTF8.GetString(decodedBytes);
 
-			var splitedData = decodedString.Split(new char[] { '|' });
+			var splittedData = decodedString.Split(['|']);
 
-			return new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-						{
-								new(ClaimTypes.NameIdentifier, splitedData[0]),
-								new(ClaimTypes.Role, splitedData[1]),
-						}, CustomAuthenticationSchemeOptions.AuthenticationScheme));
+			return new ClaimsPrincipal(new ClaimsIdentity(
+				[
+						new(ClaimTypes.NameIdentifier, splittedData[0]),
+						new(ClaimTypes.Role, splittedData[1]),
+				], CustomAuthenticationSchemeOptions.AuthenticationScheme)
+			);
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			throw new ReadTokenException(value, ex);
 		}

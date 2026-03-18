@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ public class CustomAuthenticationHandler : AuthenticationHandler<CustomAuthentic
 			var principal = _tokenService.Read(apiKey);
 			return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(principal, CustomAuthenticationSchemeOptions.AuthenticationScheme)));
 		}
-		catch (System.Exception ex)
+		catch (Exception ex)
 		{
 			return Task.FromResult(AuthenticateResult.Fail(ex));
 		}
