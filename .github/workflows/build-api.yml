@@ -1,0 +1,43 @@
+name: "Build MoviesAPI"
+
+on:
+  workflow_dispatch:
+    inputs:
+      update_type:
+        type: choice
+        default: "patch"
+        options: 
+        - major
+        - minor
+        - patch
+        - build
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+    
+jobs:
+  build_test_publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 10.0
+    - name: Restore dependencies
+      run: dotnet restore MoviesAPI/MoviesAPI.csproj
+    - name: Build project
+      run: dotnet build MoviesAPI/MoviesAPI.csproj --configuration Release --no-restore
+    - name: Run tests
+      run: dotnet test MoviesAPI.Tests/MoviesAPI.Tests.csproj --configuration Release --verbosity normal
+    - name: Publish
+      run: dotnet publish MoviesAPI/MoviesAPI.csproj -c Release -o ./MoviesAPI/publish /p:UseAppHost=false
+    - name: Deploy docker image
+      uses: ./.github/actions/build_docker_image
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        token: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository_name: "MoviesAPI"
+        context: "./MoviesAPI/"
+        dockerfile: "./MoviesAPI/Dockerfile"
