@@ -2,6 +2,7 @@
 using Domain.Queues;
 using Infrastructure.Options;
 using Infrastructure.SQS.Factories;
+using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -13,8 +14,8 @@ public class SQSService(ISQSClientFactory sqsFactory, SQSOptions options) : ISQS
 	{
 		var request = new SendMessageRequest()
 		{
-			//MessageGroupId = Guid.NewGuid().ToString(),
-			//MessageDeduplicationId = Guid.NewGuid().ToString(),
+			MessageGroupId = Guid.NewGuid().ToString(),
+			MessageDeduplicationId = Guid.NewGuid().ToString(),
 			MessageBody = JsonSerializer.Serialize(queueMessage),
 			QueueUrl = options.QueueUrl
 		};

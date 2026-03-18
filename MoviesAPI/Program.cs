@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using MoviesAPI.Auth;
 using MoviesAPI.Middlewares;
 using MoviesAPI.Options;
-using MoviesAPI.Services;
 using MoviesAPI.WebClients;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +32,6 @@ builder.Services.AddHttpClient<IIMDBWebApiClient, IMDBWebApiClient>();
 builder.Services.RegisterOptions<IMDBWebApiClientOptions>(builder.Configuration.GetSection("IMDBWebApiClient"));
 
 builder.Services.AddScoped<ISQSService, SQSService>();
-builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddSingleton<ISQSClientFactory, SQSClientFactory>();
 builder.Services.RegisterOptions<SQSOptions>(builder.Configuration.GetSection("SQS"));
 
