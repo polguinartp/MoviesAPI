@@ -1,22 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS build
 WORKDIR /src
-COPY ["MoviesAPI/MoviesAPI.csproj", "MoviesAPI/"]
-COPY ["Domain/Domain.csproj", "Domain/"]
-COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
-RUN dotnet restore "MoviesAPI/MoviesAPI.csproj"
-COPY . .
-WORKDIR "/src/MoviesAPI"
-RUN dotnet build "MoviesAPI.csproj" -c Release -o /app/build
 
-FROM build AS publish
-RUN dotnet publish "MoviesAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY ./publish .
+
 ENTRYPOINT ["dotnet", "MoviesAPI.dll"]
