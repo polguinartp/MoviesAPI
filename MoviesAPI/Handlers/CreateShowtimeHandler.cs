@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace MoviesAPI.Handlers;
 
-public class CreateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webClient) : IRequestHandler<CreateShowtimeRequest, ShowtimeResponse>
+public class CreateShowtimeHandler(IMapper mapper, CinemaDbContext dbContext, IIMDBWebApiClient webApiClient) : IRequestHandler<CreateShowtimeRequest, ShowtimeResponse>
 {
 	public async ValueTask<ShowtimeResponse> Handle(CreateShowtimeRequest request, CancellationToken cancellationToken)
 	{
 		var showtimeEntity = mapper.Map<Showtime>(request.ShowtimeRequest);
 
-		var movieInfo = await webClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
+		var movieInfo = await webApiClient.GetMovieInfoAsync(request.ShowtimeRequest.MovieId);
 		showtimeEntity.Movie = mapper.Map<Movie>(movieInfo);
 
 		var existingMovie = await dbContext.Movies.AsNoTracking().FirstOrDefaultAsync(x => x.Title.Equals(showtimeEntity.Movie.Title, StringComparison.OrdinalIgnoreCase), cancellationToken);

@@ -1,10 +1,8 @@
-using Domain.Queues;
 using Infrastructure.Database;
 using Infrastructure.SQS.Services;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using MoviesAPI.Requests;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 

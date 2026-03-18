@@ -24,7 +24,7 @@ public class GetShowtimeHandler(IMapper mapper, CinemaDbContext dbContext) : IRe
 		var query = dbContext.Showtimes.AsNoTracking().Include(x => x.Movie).AsQueryable();
 		if (request.Date.HasValue)
 		{
-			query = query.Where(x => x.StartDate.Date >= request.Date && x.EndDate.Date <= request.Date);
+			query = query.Where(x => x.StartDate.Date <= request.Date && x.EndDate.Date >= request.Date);
 		}
 		if (!string.IsNullOrEmpty(request.MovieTitle))
 		{
