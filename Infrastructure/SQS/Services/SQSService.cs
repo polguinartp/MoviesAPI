@@ -2,7 +2,6 @@
 using Domain.Queues;
 using Infrastructure.Options;
 using Infrastructure.SQS.Factories;
-using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 

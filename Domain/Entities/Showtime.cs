@@ -9,7 +9,7 @@ public class Showtime
 	public Movie Movie { get; set; }
 	public DateTime StartDate { get; set; }
 	public DateTime EndDate { get; set; }
-	public IEnumerable<string> Schedule { get; set; } = [];
+	public List<string> Schedule { get; set; } = [];
 	public int AuditoriumId { get; set; }
 	public Auditorium Auditorium { get; set; }
 }

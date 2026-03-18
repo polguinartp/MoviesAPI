@@ -3,7 +3,6 @@ using MoviesAPI.Options;
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace MoviesAPI.WebClients;
@@ -23,7 +22,7 @@ public class IMDBWebApiClient(IMDBWebApiClientOptions options, HttpClient httpCl
 		//	return result!;
 		//}
 
-		// Return dummy object if IMDB website is not available
+		// Return sample objects because IMDB website is not available anymore.
 		return imdbId switch
 		{
 			"tt0111161" => new IMDBMovieInfo(
@@ -52,9 +51,12 @@ public class IMDBWebApiClient(IMDBWebApiClientOptions options, HttpClient httpCl
 	{
 		try
 		{
-			var path = $"{options.Url}/{options.ApiKey}";
-			var httpResponseMessage = await httpClient.GetAsync(path);
-			return httpResponseMessage.StatusCode;
+			//var path = $"{options.Url}/{options.ApiKey}";
+			//var httpResponseMessage = await httpClient.GetAsync(path);
+			//return httpResponseMessage.StatusCode;
+
+			// Return 200 OK because IMDB website is not available anymore.
+			return HttpStatusCode.OK;
 		}
 		catch (HttpRequestException)
 		{

@@ -20,9 +20,8 @@ public class IMDBStatusBackgroundTask(IIMDBWebApiClient webApiClient, IMDBWebApi
 		_timer = new Timer(async o =>
 		{
 			var lastCall = DateTime.Now;
-			//var status = await webApiClient.GetStatusAsync();
-			var status = System.Net.HttpStatusCode.OK;
-
+			var status = await webApiClient.GetStatusAsync();
+			
 			var newStatus = new IMDBStatusResponse(
 				Up: status == System.Net.HttpStatusCode.OK,
 				LastCall: lastCall

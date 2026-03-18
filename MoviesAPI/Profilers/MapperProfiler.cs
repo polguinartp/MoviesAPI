@@ -12,7 +12,7 @@ public class MapperProfiler : Profile
 {
 	public MapperProfiler()
 	{
-		CreateMap<Domain.Entities.Showtime, ShowtimeResponse>()
+		CreateMap<Showtime, ShowtimeResponse>()
 				.ForMember(dest => dest.StartDate, o => o.MapFrom(src => src.StartDate.ToString()))
 				.ForMember(dest => dest.EndDate, o => o.MapFrom(src => src.EndDate.ToString()))
 				.ForMember(dest => dest.Schedule, o => o.MapFrom(src => string.Join(',', src.Schedule)));
