@@ -4,6 +4,7 @@ using MoviesAPI.DTOs.IMDB;
 using MoviesAPI.DTOs.Requests;
 using MoviesAPI.DTOs.Responses;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace MoviesAPI.Profilers;
@@ -18,8 +19,8 @@ public class MapperProfile : Profile
 				.ForMember(dest => dest.Schedule, o => o.MapFrom(src => string.Join(',', src.Schedule)));
 
 		CreateMap<ShowtimeRequest, Showtime>()
-				.ForMember(dest => dest.StartDate, o => o.MapFrom(src => DateTime.Parse(src.StartDate)))
-				.ForMember(dest => dest.EndDate, o => o.MapFrom(src => DateTime.Parse(src.EndDate)))
+				.ForMember(dest => dest.StartDate, o => o.MapFrom(src => DateTime.Parse(src.StartDate, CultureInfo.InvariantCulture)))
+				.ForMember(dest => dest.EndDate, o => o.MapFrom(src => DateTime.Parse(src.EndDate, CultureInfo.InvariantCulture)))
 				.ForMember(dest => dest.Schedule, o => o.MapFrom(src => src.Schedule.Split(',', StringSplitOptions.None).ToList()));
 
 		CreateMap<Movie, MovieResponse>();

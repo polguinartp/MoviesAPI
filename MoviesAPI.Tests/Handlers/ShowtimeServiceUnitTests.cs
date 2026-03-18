@@ -90,7 +90,7 @@ public class ShowtimeServiceUnitTests
 		var handler = new CreateShowtimeHandler(_mapper, _dbContext, _mockWebApiClient.Object);
 
 		var result = await handler.Handle(new CreateShowtimeRequest(
-			new ShowtimeRequest("31/12/2019", "31/12/2021", "08:00,10:00", movieId, 1)),
+			new ShowtimeRequest("12/31/2019", "12/31/2021", "08:00,10:00", movieId, 1)),
 			CancellationToken.None
 		);
 
