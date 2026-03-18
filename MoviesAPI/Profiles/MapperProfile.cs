@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace MoviesAPI.Profilers;
 
-public class MapperProfiler : Profile
+public class MapperProfile : Profile
 {
-	public MapperProfiler()
+	public MapperProfile()
 	{
 		CreateMap<Showtime, ShowtimeResponse>()
 				.ForMember(dest => dest.StartDate, o => o.MapFrom(src => src.StartDate.ToString()))
