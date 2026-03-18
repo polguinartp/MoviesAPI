@@ -1,7 +1,6 @@
 ﻿using Amazon;
 using Amazon.Runtime;
 using Amazon.SQS;
-using Infrastructure.Options;
 
 namespace Infrastructure.SQS.Factories;
 

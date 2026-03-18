@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Options;
+﻿namespace Infrastructure.SQS;
 
 public class SQSOptions
 {

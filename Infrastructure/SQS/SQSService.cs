@@ -1,6 +1,5 @@
 ﻿using Amazon.SQS.Model;
 using Domain.Queues;
-using Infrastructure.Options;
 using Infrastructure.SQS.Factories;
 using System;
 using System.Text.Json;

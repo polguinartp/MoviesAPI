@@ -11,10 +11,10 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using MoviesAPI.Background;
 using Serilog;
-using Infrastructure.Options;
 using Infrastructure.SQS.Factories;
 using Infrastructure.SQS.Services;
 using MoviesAPI.Extensions;
+using Infrastructure.SQS;
 
 var builder = WebApplication.CreateBuilder(args);
 
