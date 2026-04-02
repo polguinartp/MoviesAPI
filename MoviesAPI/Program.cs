@@ -61,6 +61,9 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+builder.Services.AddExceptionHandler<ExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddHostedService<IMDBStatusBackgroundTask>();
 builder.Host.UseSerilog();
 
@@ -76,13 +79,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<RequestLoggerMiddleware>();
-app.ConfigureExceptionHandler();
 
 app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
