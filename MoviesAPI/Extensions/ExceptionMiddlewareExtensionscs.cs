@@ -29,7 +29,7 @@ public static class ExceptionMiddlewareExtensions
 				if (contextFeature != null)
 				{
 					var errorInfo = new ErrorInfo(context.Response.StatusCode, $"Internal Server Error: {contextFeature.Error.Message}");
-					await context.Response.WriteAsync(errorInfo.ToString());
+					await context.Response.WriteAsJsonAsync(errorInfo);
 				}
 			});
 		});

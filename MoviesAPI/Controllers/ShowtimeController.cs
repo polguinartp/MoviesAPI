@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MoviesAPI.Auth;
 using MoviesAPI.DTOs.Requests;
 using MoviesAPI.DTOs.Responses;
 using MoviesAPI.Requests;
@@ -15,10 +14,10 @@ namespace MoviesAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ShowtimeController(ISender sender) : Controller
 {	
 	[HttpGet]
-	[Authorize(Roles = Constants.Roles.Read)]
 	public async Task<ActionResult<IEnumerable<ShowtimeResponse>>> GetAsync([FromQuery] DateTime? date, [FromQuery] string? movieTitle)
 	{
 		var entities = await sender.Send(new GetShowtimeRequest(date, movieTitle), CancellationToken.None);
@@ -26,7 +25,6 @@ public class ShowtimeController(ISender sender) : Controller
 	}
 
 	[HttpGet("{id}")]
-	[Authorize(Roles = Constants.Roles.Read)]
 	public async Task<ActionResult<ShowtimeResponse>> GetAsync([FromRoute] int id)
 	{
 		var showtime = await sender.Send(new GetShowtimeByIdRequest(id), CancellationToken.None);
@@ -34,7 +32,6 @@ public class ShowtimeController(ISender sender) : Controller
 	}
 
 	[HttpPost]
-	[Authorize(Roles = Constants.Roles.Write)]
 	public async Task<ActionResult<ShowtimeResponse>> PostAsync([FromBody] ShowtimeRequest showtime)
 	{
 		var result = await sender.Send(new CreateShowtimeRequest(showtime), CancellationToken.None);
@@ -42,7 +39,6 @@ public class ShowtimeController(ISender sender) : Controller
 	}
 
 	[HttpPut("{id}")]
-	[Authorize(Roles = Constants.Roles.Write)]
 	public async Task<ActionResult<ShowtimeResponse>> Put([FromRoute] int id, [FromBody] ShowtimeRequest showtime)
 	{
 		var existing = await sender.Send(new GetShowtimeByIdRequest(id), CancellationToken.None);
@@ -56,7 +52,6 @@ public class ShowtimeController(ISender sender) : Controller
 	}
 
 	[HttpDelete("{id}")]
-	[Authorize(Roles = Constants.Roles.Write)]
 	public async Task<ActionResult> Delete([FromRoute] int id)
 	{
 		var existing = await sender.Send(new GetShowtimeByIdRequest(id), CancellationToken.None);
@@ -70,7 +65,6 @@ public class ShowtimeController(ISender sender) : Controller
 	}
 
 	[HttpPatch]
-	[Authorize(Roles = Constants.Roles.Write)]
 	public ActionResult Patch()
 	{
 		return StatusCode(StatusCodes.Status500InternalServerError, "Test error handler");
