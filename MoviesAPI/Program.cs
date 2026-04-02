@@ -64,6 +64,10 @@ builder.Services.AddAuthorization();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+Log.Logger = new LoggerConfiguration()
+		.ReadFrom.Configuration(builder.Configuration)
+		.CreateLogger();
+
 builder.Services.AddHostedService<IMDBStatusBackgroundTask>();
 builder.Host.UseSerilog();
 
